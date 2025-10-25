@@ -1,0 +1,10 @@
+{
+  "name": "@card-collection-manager-app/client-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@card-collection-manager-app/client"
+    ]
+  }
+}

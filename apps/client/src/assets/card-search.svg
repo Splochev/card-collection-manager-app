@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" role="img" aria-label="Search Yu-Gi-Oh cards">
+  <title>Search Yu-Gi-Oh! cards</title>
+  <desc>Yu-Gi-Oh style trading card with multiple stars and Egyptian motif, overlaid with a magnifying glass.</desc>
+  <g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Card outline -->
+    <rect x="5" y="2" width="12" height="20" rx="1.5"></rect>
+    <!-- Level stars (smaller + more spaced) -->
+    <g fill="currentColor" stroke="none">
+      <polygon points="0,-0.4 0.12,-0.13 0.4,-0.12 0.16,0.07 0.25,0.35 0,0.2 -0.25,0.35 -0.16,0.07 -0.4,-0.12 -0.12,-0.13" transform="translate(6,4.5) scale(1.6)"></polygon>
+      <polygon points="0,-0.4 0.12,-0.13 0.4,-0.12 0.16,0.07 0.25,0.35 0,0.2 -0.25,0.35 -0.16,0.07 -0.4,-0.12 -0.12,-0.13" transform="translate(8,4.5) scale(1.6)"></polygon>
+      <polygon points="0,-0.4 0.12,-0.13 0.4,-0.12 0.16,0.07 0.25,0.35 0,0.2 -0.25,0.35 -0.16,0.07 -0.4,-0.12 -0.12,-0.13" transform="translate(10,4.5) scale(1.6)"></polygon>
+      <polygon points="0,-0.4 0.12,-0.13 0.4,-0.12 0.16,0.07 0.25,0.35 0,0.2 -0.25,0.35 -0.16,0.07 -0.4,-0.12 -0.12,-0.13" transform="translate(12,4.5) scale(1.6)"></polygon>
+      <polygon points="0,-0.4 0.12,-0.13 0.4,-0.12 0.16,0.07 0.25,0.35 0,0.2 -0.25,0.35 -0.16,0.07 -0.4,-0.12 -0.12,-0.13" transform="translate(14,4.5) scale(1.6)"></polygon>
+    </g>
+    <!-- Pyramid motif -->
+    <polygon points="11 15 8 11 14 11" stroke="currentColor" fill="currentColor" fill-opacity=".15"></polygon>
+    <circle cx="11" cy="12.5" r="0.5" fill="currentColor"></circle>
+    <!-- Magnifying glass -->
+    <circle cx="20" cy="20" r="4"></circle>
+    <line x1="22.8" y1="22.8" x2="26" y2="26"></line>
+  </g>
+</svg>
