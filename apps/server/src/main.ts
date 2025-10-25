@@ -28,7 +28,6 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true })
   );
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
-  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('Card Collection Manager API')
@@ -52,9 +51,9 @@ async function bootstrap() {
 
   const port = 8080;
   await app.listen(port);
-  Logger.log(`🚀 Application is running on: http://localhost:${port}/api`);
+  Logger.log(`🚀 Application is running on: http://localhost:${port}`);
   Logger.log(
-    `📚 Swagger documentation available at: http://localhost:${port}/api/docs`
+    `📚 Swagger documentation available at: http://localhost:${port}/docs`
   );
 }
 
