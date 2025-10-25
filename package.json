@@ -2,7 +2,9 @@
   "name": "@card-collection-manager-app/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "client": "npx nx serve client"
+  },
   "private": true,
   "dependencies": {
     "react": "^19.0.0",
