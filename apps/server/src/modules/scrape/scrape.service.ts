@@ -425,7 +425,7 @@ export class ScrapeService {
             // Retry logic for failed requests
             for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
               try {
-                const marketURL = await this.getMarketplaceUrl(
+                await this.getMarketplaceUrl(
                   edition.cardNumber,
                   browser,
                 );
