@@ -5,7 +5,6 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ThemeSwitch from '../../atoms/ThemeSwitch';
@@ -83,7 +82,7 @@ const UserMenu = () => {
                 right: 14,
                 width: 10,
                 height: 10,
-                bgcolor: 'background.paper',
+                bgcolor: 'transparent',
                 transform: 'translateY(-50%) rotate(45deg)',
                 zIndex: 0,
               },
@@ -91,14 +90,13 @@ const UserMenu = () => {
           },
         }}
       >
-        <MenuItem onClick={handleEditUser}>
+        <MenuItem onClick={handleEditUser} sx={{ height: 48 }}>
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Edit User</ListItemText>
         </MenuItem>
-        <Divider />
-        <MenuItem onClick={(e) => e.stopPropagation()}>
+        <MenuItem onClick={(e) => e.stopPropagation()} sx={{ height: 48 }}>
           <Box
             sx={{
               display: 'flex',
@@ -111,8 +109,7 @@ const UserMenu = () => {
             <ThemeSwitch />
           </Box>
         </MenuItem>
-        <Divider />
-        <MenuItem onClick={handleLogout}>
+        <MenuItem onClick={handleLogout} sx={{ height: 48 }}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
