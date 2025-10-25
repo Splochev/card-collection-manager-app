@@ -1,0 +1,26 @@
+{
+  "name": "@card-collection-manager-app/server-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@card-collection-manager-app/server"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "apps/server-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@card-collection-manager-app/server:build",
+          "@card-collection-manager-app/server:serve"
+        ]
+      }
+    }
+  }
+}
