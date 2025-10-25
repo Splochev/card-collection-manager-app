@@ -18,6 +18,7 @@
     "@nx/eslint-plugin": "22.0.1",
     "@nx/jest": "22.0.1",
     "@nx/js": "22.0.1",
+    "@nx/nest": "^22.0.1",
     "@nx/playwright": "22.0.1",
     "@nx/react": "22.0.1",
     "@nx/vite": "22.0.1",
