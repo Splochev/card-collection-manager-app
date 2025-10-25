@@ -1,6 +1,6 @@
 import CardSearchIcon from './components/icons/CardSearchIcon';
 import CollectionIcon from './components/icons/CollectionIcon';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteIcon from './components/icons/FavoriteIcon';
 
 const BACKEND_URL =
   import.meta.env.VITE_REACT_LOCAL_BACKEND_URL || 'http://localhost:8080';
