@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "client": "npx nx serve client"
+    "client": "npx nx serve client",
+    "server": "npx nx run @card-collection-manager-app/server:serve:dev"
   },
   "private": true,
   "dependencies": {
