@@ -319,7 +319,6 @@ export class ScrapeService {
       // Increased delay before clicking/submitting
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const searchButton = await page.$('#search-btn');
       if (searchButton) {
         await Promise.all([
@@ -339,7 +338,6 @@ export class ScrapeService {
         ]);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const currentUrl = page.url();
       const parsedURL = currentUrl + `?language=1&minCondition=4`;
       await this.cardService.updateCardEditionMarketUrl(
@@ -361,7 +359,7 @@ export class ScrapeService {
       if (page) {
         try {
           await page.close();
-        } catch (closeError) {
+        } catch{
           // Ignore errors when closing page
         }
       }
@@ -369,7 +367,7 @@ export class ScrapeService {
       if (shouldCloseBrowser && browser) {
         try {
           await browser.close();
-        } catch (closeError) {
+        } catch{
           // Ignore errors when closing browser
         }
       }

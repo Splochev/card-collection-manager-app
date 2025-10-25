@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Not, Repository } from 'typeorm';
@@ -135,7 +136,7 @@ export class CardsService {
         where: { cardNumber },
         relations: ['cards'],
       });
-    } catch (error) {
+    } catch {
       throw new HttpException(
         `Card with number "${cardNumber}" not found`,
         404,
@@ -199,6 +200,7 @@ export class CardsService {
 
   formatCardData(card: ICard, cardQuery: CardQueryDto): CardDto {
     const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       id,
       name,
       type,
@@ -353,7 +355,6 @@ export class CardsService {
       if (fs.existsSync(seedFilePath)) {
         const fileContent = fs.readFileSync(seedFilePath, 'utf-8');
         try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           existingData = JSON.parse(fileContent);
         } catch {
           existingData = [];
@@ -367,7 +368,7 @@ export class CardsService {
     try {
       const payload = { collectionName, count: cards.length, cardSetCode };
       this.scrapeGateway?.notifySearchFinished(payload, socketId);
-    } catch (e) {
+    } catch {
       // ignore errors emitting websocket notifications
     }
   }
@@ -414,7 +415,7 @@ export class CardsService {
       if (keys && keys.length > 0) {
         await Promise.all(keys.map((key) => this.cacheService.del(key)));
       }
-    } catch (error) {
+    } catch {
       throw new NotFoundException('Card not found');
     }
   }
@@ -549,7 +550,10 @@ export class CardsService {
         });
       }
 
-      const group = groupMap.get(groupKey)!;
+      const group = groupMap.get(groupKey);
+      if (!group) {
+        throw new Error(`Group with key "${groupKey}" not found in groupMap.`);
+      }
       group.totalCount += typedUserCard.count;
       group.cards.push({
         id: cardEdition.id,
