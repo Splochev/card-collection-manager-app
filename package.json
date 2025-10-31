@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "client": "npx nx serve client",
-    "server": "npx nx run @card-collection-manager-app/server:serve:dev"
+    "server": "npx nx run @card-collection-manager-app/server:serve:dev",
+    "scraper": "npx nx serve scrape-service"
   },
   "private": true,
   "dependencies": {
@@ -52,10 +53,11 @@
     "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.1.7",
     "@nx/devkit": "22.0.1",
+    "@nx/esbuild": "22.0.1",
     "@nx/eslint": "22.0.1",
     "@nx/eslint-plugin": "22.0.1",
     "@nx/jest": "22.0.1",
-    "@nx/js": "22.0.1",
+    "@nx/js": "^22.0.2",
     "@nx/nest": "^22.0.1",
     "@nx/node": "22.0.1",
     "@nx/playwright": "22.0.1",
@@ -82,6 +84,7 @@
     "@vitejs/plugin-react": "^4.2.0",
     "@vitest/ui": "^3.0.0",
     "babel-jest": "^30.0.2",
+    "esbuild": "^0.19.2",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "2.31.0",
