@@ -1,1 +1,1 @@
-export { default as sharedConstants } from './lib/constants';
+export * from './lib/shared.js';
