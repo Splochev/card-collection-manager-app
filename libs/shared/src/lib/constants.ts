@@ -1,12 +1,7 @@
-const MICROSERVICES_GROUPS = {
+export const MICROSERVICES_GROUPS = {
   SCRAPE_GROUP: 'scrape',
 } as const;
 
-const SCRAPE_TOPICS = {
+export const SCRAPE_TOPICS = {
   SCRAPE: 'scrape-jobs',
 } as const;
-
-export default {
-  MICROSERVICES_GROUPS,
-  SCRAPE_TOPICS,
-};

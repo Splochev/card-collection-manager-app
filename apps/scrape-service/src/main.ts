@@ -1,5 +1,8 @@
 import { Kafka } from 'kafkajs';
-import { sharedConstants } from '@card-collection-manager-app/shared';
+import {
+  MICROSERVICES_GROUPS,
+  SCRAPE_TOPICS,
+} from '@card-collection-manager-app/shared';
 
 const kafka = new Kafka({
   clientId: 'scrape-service',
@@ -7,13 +10,13 @@ const kafka = new Kafka({
 });
 
 const consumer = kafka.consumer({
-  groupId: sharedConstants.MICROSERVICES_GROUPS.SCRAPE_GROUP,
+  groupId: MICROSERVICES_GROUPS.SCRAPE_GROUP,
 });
 
 async function run() {
   await consumer.connect();
   await consumer.subscribe({
-    topic: sharedConstants.SCRAPE_TOPICS.SCRAPE,
+    topic: SCRAPE_TOPICS.SCRAPE,
     fromBeginning: true,
   });
 
