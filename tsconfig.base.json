@@ -16,5 +16,11 @@
     "skipLibCheck": true,
     "strict": true,
   "target": "es2022"
+  ,
+    "paths": {
+      "@card-collection-manager-app/shared": [
+        "libs/shared/src/index.ts"
+      ]
+    }
   }
 }

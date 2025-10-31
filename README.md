@@ -10,3 +10,9 @@ npm install
 # To start app:
 npm run client
 npm run server
+
+# Kafka Dashboard:
+http://localhost:8081/
+
+# Get tree
+tree -I "node_modules|.nx|dist" > structure.txt

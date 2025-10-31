@@ -16,6 +16,7 @@
     "@nestjs/core": "^11.1.7",
     "@nestjs/jwt": "^11.0.1",
     "@nestjs/mapped-types": "^2.1.0",
+    "@nestjs/microservices": "^11.1.8",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.7",
     "@nestjs/platform-socket.io": "^11.1.7",
@@ -32,6 +33,7 @@
     "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.2.0",
+    "kafkajs": "^2.2.4",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
@@ -116,6 +118,8 @@
     "webpack-cli": "^5.1.4"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "libs",
+    "libs/*"
   ]
 }

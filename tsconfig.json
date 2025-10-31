@@ -17,6 +17,9 @@
     },
     {
       "path": "./apps/scrape-service"
+    },
+    {
+      "path": "./libs/shared"
     }
   ]
 }
