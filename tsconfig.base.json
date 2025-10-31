@@ -17,9 +17,10 @@
     "strict": true,
   "target": "es2022"
   ,
+    "baseUrl": ".",
     "paths": {
       "@card-collection-manager-app/shared": [
-        "libs/shared/src/index.ts"
+        "libs/shared"
       ]
     }
   }

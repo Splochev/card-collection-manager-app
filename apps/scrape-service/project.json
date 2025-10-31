@@ -1,0 +1,53 @@
+{
+  "name": "@card-collection-manager-app/scrape-service",
+  "root": "apps/scrape-service",
+  "sourceRoot": "apps/scrape-service/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "apps/scrape-service/dist",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/scrape-service/src/main.ts",
+        "tsConfig": "apps/scrape-service/tsconfig.app.json",
+        "assets": ["apps/scrape-service/src/assets"],
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": { ".js": ".js" }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": { ".js": ".js" }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "@card-collection-manager-app/scrape-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@card-collection-manager-app/scrape-service:build:development"
+        },
+        "production": {
+          "buildTarget": "@card-collection-manager-app/scrape-service:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}
