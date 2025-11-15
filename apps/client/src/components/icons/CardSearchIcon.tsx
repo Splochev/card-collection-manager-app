@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import CardSearchSvg from '../../assets/card-search.svg?react';
 import { store } from '../../stores/store';
 import { darkTheme, lightTheme } from '../../themes';

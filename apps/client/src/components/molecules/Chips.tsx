@@ -66,7 +66,6 @@ const Chips = ({ labels, width = '35rem' }: Props) => {
     e.preventDefault();
     startScrolling(position);
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (e.currentTarget as any).setPointerCapture?.(e.pointerId);
     } catch {
       /* ignore */
@@ -76,7 +75,6 @@ const Chips = ({ labels, width = '35rem' }: Props) => {
   const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
     stopScrolling();
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
     } catch {
       /* ignore */

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Paper from '@mui/material/Paper';
 import {
   Route,

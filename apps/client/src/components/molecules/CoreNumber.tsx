@@ -135,7 +135,6 @@ const CoreNumber = ({
 
       if (elapsed >= 1500 && speed === 120) {
         speed = 40;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         clearInterval(holdInterval.current!);
         holdInterval.current = window.setInterval(() => {
           if (holdAction.current) holdAction.current();

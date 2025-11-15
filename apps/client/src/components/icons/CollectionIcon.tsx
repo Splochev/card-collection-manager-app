@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import CollectionSvg from '../../assets/collection.svg?react';
 import { store } from '../../stores/store';
 import { darkTheme, lightTheme } from '../../themes';
@@ -14,7 +12,9 @@ const CollectionIcon = ({ size = 'small', color }: IconProps) => {
   return (
     <CollectionSvg
       className={
-        typeof size === 'string' && ICON_SIZE_MAP[size] ? ICON_SIZE_MAP[size] : ''
+        typeof size === 'string' && ICON_SIZE_MAP[size]
+          ? ICON_SIZE_MAP[size]
+          : ''
       }
       style={{
         fill: 'currentColor',

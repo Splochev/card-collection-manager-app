@@ -126,7 +126,9 @@ const WishlistManager = ({
             min={0}
             max={100}
             value={wishlistQuantity}
-            setValue={setWishlistQuantity}
+            setValue={(value: number | '') =>
+              setWishlistQuantity(Number(value))
+            }
             label={
               isInWishlist
                 ? `Wishlisted: ${card.wishlistCount}`
