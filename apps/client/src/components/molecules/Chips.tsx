@@ -5,16 +5,35 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useRef, useState, useEffect } from 'react';
 
-const Chips = ({
-  labels,
-  width = '35rem',
-}: {
+const SCROLL_STEP = 5;
+const SCROLL_TICK = 8;
+
+const STYLES = {
+  container: {
+    display: 'flex',
+    gap: 1,
+    alignItems: 'center',
+  },
+  chipContainer: {
+    display: 'flex',
+    gap: 1,
+    overflowX: 'auto',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+  },
+};
+
+interface Props {
   labels: string[];
   width?: string;
-}) => {
+}
+
+const Chips = ({ labels, width = '35rem' }: Props) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const scrollIntervalRef = useRef<number | null>(null);
 
   const updateScrollButtons = () => {
     const el = scrollRef.current;
@@ -22,10 +41,6 @@ const Chips = ({
     setCanScrollLeft(el.scrollLeft > 0);
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth);
   };
-
-  const scrollIntervalRef = useRef<number | null>(null);
-  const SCROLL_STEP = 5;
-  const SCROLL_TICK = 8;
 
   const stopScrolling = () => {
     if (scrollIntervalRef.current !== null) {
@@ -44,6 +59,30 @@ const Chips = ({
     }, SCROLL_TICK) as unknown as number;
   };
 
+  const onPointerDown = (
+    e: React.PointerEvent<HTMLButtonElement>,
+    position: number,
+  ) => {
+    e.preventDefault();
+    startScrolling(position);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const onPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    stopScrolling();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  };
+
   useEffect(() => {
     updateScrollButtons();
     const el = scrollRef.current;
@@ -57,82 +96,31 @@ const Chips = ({
     };
   }, [labels.length]);
 
+  const buttonProps = (position: 'l' | 'r') => ({
+    disabled: position === 'l' ? !canScrollLeft : !canScrollRight,
+    onPointerDown: (e: React.PointerEvent<HTMLButtonElement>) =>
+      onPointerDown(e, position === 'l' ? -1 : 1),
+    onPointerUp: onPointerUp,
+    onPointerCancel: stopScrolling,
+    onPointerLeave: stopScrolling,
+    'aria-label': position === 'l' ? 'Scroll left' : 'Scroll right',
+  });
+
   const showButtons = canScrollLeft || canScrollRight;
   return (
-    <Grid
-      sx={{
-        display: 'flex',
-        gap: 1,
-        maxWidth: width,
-        alignItems: 'center',
-      }}
-    >
+    <Grid sx={{ ...STYLES.container, maxWidth: width }}>
       {showButtons && (
-        <IconButton
-          disabled={!canScrollLeft}
-          onPointerDown={(e) => {
-            e.preventDefault();
-            startScrolling(-1);
-            try {
-              (e.currentTarget as any).setPointerCapture?.(e.pointerId);
-            } catch {
-              /* ignore */
-            }
-          }}
-          onPointerUp={(e) => {
-            stopScrolling();
-            try {
-              (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
-            } catch {
-              /* ignore */
-            }
-          }}
-          onPointerCancel={() => stopScrolling()}
-          onPointerLeave={() => stopScrolling()}
-          aria-label="Scroll left"
-        >
+        <IconButton {...buttonProps('l')}>
           <ChevronLeftIcon />
         </IconButton>
       )}
-      <Grid
-        ref={scrollRef}
-        sx={{
-          display: 'flex',
-          gap: 1,
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          '&::-webkit-scrollbar': { display: 'none' },
-        }}
-      >
+      <Grid ref={scrollRef} sx={STYLES.chipContainer}>
         {labels.map((label, index) => (
           <Chip key={`${label}-${index}`} label={label} />
         ))}
       </Grid>
       {showButtons && (
-        <IconButton
-          disabled={!canScrollRight}
-          onPointerDown={(e) => {
-            e.preventDefault();
-            startScrolling(1);
-            try {
-              (e.currentTarget as any).setPointerCapture?.(e.pointerId);
-            } catch {
-              /* ignore */
-            }
-          }}
-          onPointerUp={(e) => {
-            stopScrolling();
-            try {
-              (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
-            } catch {
-              /* ignore */
-            }
-          }}
-          onPointerCancel={() => stopScrolling()}
-          onPointerLeave={() => stopScrolling()}
-          aria-label="Scroll right"
-        >
+        <IconButton {...buttonProps('r')}>
           <ChevronRightIcon />
         </IconButton>
       )}

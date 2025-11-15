@@ -4,6 +4,7 @@ export interface ICard {
   cardSetName: string;
   name: string;
   rarities: string[];
+  marketURL?: string;
   cardId: string;
   cardSetNames: string[];
   type: string;

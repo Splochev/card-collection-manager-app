@@ -3,12 +3,7 @@
 import CardSearchSvg from '../../assets/card-search.svg?react';
 import { store } from '../../stores/store';
 import { darkTheme, lightTheme } from '../../themes';
-
-const SIZE_MAP = {
-  small: 'h-8',
-  medium: 'h-10',
-  large: 'h-12',
-};
+import { ICON_SIZE_MAP } from '../../constants';
 
 type IconProps = {
   size?: 'small' | 'medium' | 'large';
@@ -18,14 +13,14 @@ type IconProps = {
 const CardSearchIcon = ({ size = 'small', color }: IconProps) => {
   return (
     <CardSearchSvg
-      className={SIZE_MAP[size]}
+      className={ICON_SIZE_MAP[size]}
       style={{
         fill: 'currentColor',
         color: color
           ? color
           : store.getState().theme.mode === 'light'
-          ? lightTheme.palette.primary.main
-          : darkTheme.palette.primary.main,
+            ? lightTheme.palette.primary.main
+            : darkTheme.palette.primary.main,
       }}
     />
   );

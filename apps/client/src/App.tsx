@@ -18,11 +18,7 @@ import {
   useHandleSignInCallback,
 } from '@logto/react';
 import Grid from '@mui/material/Grid';
-
-const LOGTO_ENDPOINT = import.meta.env.VITE_LOGTO_ENDPOINT;
-const LOGTO_APP_ID = import.meta.env.VITE_LOGTO_APP_ID;
-const LOGTO_REDIRECT_URI = import.meta.env.VITE_LOGTO_REDIRECT_URI;
-const LOGTO_RESOURCE = import.meta.env.VITE_LOGTO_RESOURCE;
+import { LOGTO_APP_ID, LOGTO_ENDPOINT, LOGTO_REDIRECT_URI, LOGTO_RESOURCE } from './constants';
 
 const config: LogtoConfig = {
   endpoint: LOGTO_ENDPOINT,

@@ -1,12 +1,6 @@
 import logo from '../../assets/logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-const SIZE_MAP = {
-  small: 'h-8',
-  medium: 'h-10',
-  large: 'h-12',
-  xlarge: 'h-24',
-};
+import { ICON_SIZE_MAP } from '../../constants';
 
 type LogoProps = {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
@@ -43,7 +37,7 @@ const Logo = ({ size = 'small', disableClick = false }: LogoProps) => {
       <img
         src={logo}
         alt="Logo"
-        className={SIZE_MAP[size]}
+        className={ICON_SIZE_MAP[size]}
         style={{
           transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
         }}

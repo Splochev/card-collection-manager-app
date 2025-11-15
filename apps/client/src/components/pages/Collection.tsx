@@ -201,7 +201,7 @@ const Collection = () => {
                     gridTemplateColumns: {
                       xs: 'repeat(auto-fill, minmax(140px, 1fr))',
                       sm: 'repeat(auto-fill, minmax(160px, 1fr))',
-                      md: 'repeat(auto-fill, minmax(180px, 1fr))',
+                      md: 'repeat(auto-fill, minmax(200px, 1fr))',
                     },
                     gap: { xs: 1, sm: 2 },
                     justifyItems: 'center',

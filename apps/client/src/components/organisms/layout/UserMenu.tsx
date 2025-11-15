@@ -13,9 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser, setAccessToken } from '../../../stores/userSlice';
 import type { RootState } from '../../../stores/store';
 import { useLogto } from '@logto/react';
-
-const VITE_LOGTO_POST_LOGOUT_REDIRECT_URI = import.meta.env
-  .VITE_LOGTO_POST_LOGOUT_REDIRECT_URI;
+import { LOGTO_POST_LOGOUT_REDIRECT_URI } from '../../../constants';
 
 const UserMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -43,7 +41,7 @@ const UserMenu = () => {
     dispatch(setAccessToken(null));
     handleClose();
 
-    await signOut(VITE_LOGTO_POST_LOGOUT_REDIRECT_URI);
+    await signOut(LOGTO_POST_LOGOUT_REDIRECT_URI);
   };
 
   return (

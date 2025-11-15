@@ -2,9 +2,9 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Paper from '@mui/material/Paper';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { PAGES } from '../../../constants';
 import { getTabProps } from '../../../utils';
 import * as React from 'react';
+import { PAGES } from '../../layouts/PageLayout';
 
 const BottomNavigation = ({
   value,
@@ -41,9 +41,9 @@ const BottomNavigation = ({
           },
         }}
       >
-        {PAGES.map((page) => (
+        {PAGES.map((page, index) => (
           <Tab
-            key={`mobile-${page.index}-${page.label}`}
+            key={`mobile-${index}-${page.label}`}
             label={
               <div
                 style={{
@@ -59,13 +59,13 @@ const BottomNavigation = ({
               </div>
             }
             component="a"
-            href={page.route}
+            href={page.path}
             onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
               if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
                 e.preventDefault();
               }
             }}
-            {...getTabProps(page.index)}
+            {...getTabProps(index)}
           />
         ))}
       </Tabs>

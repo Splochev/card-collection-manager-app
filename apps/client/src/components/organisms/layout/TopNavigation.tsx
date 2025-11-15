@@ -7,12 +7,12 @@ import Grid from '@mui/material/Grid';
 import CoreInput from '../../molecules/CoreInput';
 import SearchIcon from '@mui/icons-material/Search';
 import debounce from 'lodash/debounce';
-import { PAGES, ROUTES_MAP } from '../../../constants';
 import { getTabProps } from '../../../utils';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Box } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import UserMenu from './UserMenu';
+import { PAGES } from '../../layouts/PageLayout';
 
 const TopNavigation = ({
   value,
@@ -31,12 +31,12 @@ const TopNavigation = ({
 
   // Sync search input with URL
   React.useEffect(() => {
-    if (location.pathname.includes(ROUTES_MAP.CARDS)) {
+    if (location.pathname.includes(PAGES[0].path)) {
       // For Cards page, read from URL path params
       const cardSetCode = location.pathname.split('/cards/')[1];
       const upperCaseCardSetCode = cardSetCode ? cardSetCode.toUpperCase() : '';
       setSearchValue(upperCaseCardSetCode);
-    } else if (location.pathname.includes(ROUTES_MAP.COLLECTION)) {
+    } else if (location.pathname.includes(PAGES[1].path)) {
       // For Collection page, read from query params
       const filter = searchParams.get('filter') || '';
       setSearchValue(filter.toUpperCase());
@@ -50,11 +50,11 @@ const TopNavigation = ({
     (value: string) => {
       const upperValue = value.toUpperCase();
 
-      if (location.pathname.includes(ROUTES_MAP.CARDS)) {
+      if (location.pathname.includes(PAGES[0].path)) {
         // For Cards page, update URL path
         const newPath = upperValue ? `/cards/${upperValue}` : '/cards';
         navigate(newPath);
-      } else if (location.pathname.includes(ROUTES_MAP.COLLECTION)) {
+      } else if (location.pathname.includes(PAGES[1].path)) {
         // For Collection page, update query params
         const newParams = new URLSearchParams(searchParams);
         if (upperValue) {
@@ -67,12 +67,12 @@ const TopNavigation = ({
         });
       }
     },
-    [location.pathname, navigate, searchParams]
+    [location.pathname, navigate, searchParams],
   );
 
   const debouncedHandleSearch = React.useMemo(
     () => debounce(handleSearch, 400),
-    [handleSearch]
+    [handleSearch],
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +82,7 @@ const TopNavigation = ({
   };
 
   const label =
-    PAGES.find((page) => location.pathname.includes(page.route))?.searchLabel ||
+    PAGES.find((page) => location.pathname.includes(page.path))?.searchLabel ||
     'Search';
 
   return (
@@ -102,9 +102,9 @@ const TopNavigation = ({
           <Grid container spacing={2} alignItems="center">
             <Logo />
             <Tabs value={value} onChange={handleChange} aria-label="navigation">
-              {PAGES.map((page) => (
+              {PAGES.map((page, index) => (
                 <Tab
-                  key={`desktop-${page.index}-${page.label}`}
+                  key={`desktop-${index}-${page.label}`}
                   label={
                     <div
                       style={{
@@ -118,13 +118,13 @@ const TopNavigation = ({
                     </div>
                   }
                   component="a"
-                  href={page.route}
+                  href={page.path}
                   onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                     if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
                       e.preventDefault();
                     }
                   }}
-                  {...getTabProps(page.index)}
+                  {...getTabProps(index)}
                 />
               ))}
             </Tabs>

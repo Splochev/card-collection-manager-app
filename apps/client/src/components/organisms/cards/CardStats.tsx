@@ -4,23 +4,24 @@ import Typography from '@mui/material/Typography';
 import type { ICard } from '../../../interfaces/card.interface';
 import CardDescription from './CardDescription';
 
+const STYLES = {
+  paper: {
+    padding: 2,
+    borderRadius: 3,
+    gap: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+  },
+};
+
 const CardStats = ({ card }: { card: ICard | null }) => {
   const typeline = card?.typeline
     ? card.typeline.replace(/["{}]/g, ' ').replace(',', ' / ')
     : card?.type;
   const isMonster = card?.type?.includes('Monster');
   return (
-    <Paper
-      elevation={6}
-      sx={{
-        padding: 2,
-        borderRadius: 3,
-        gap: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-      }}
-    >
+    <Paper elevation={6} sx={STYLES.paper}>
       <Typography variant="h6" component="p">
         Card stats
       </Typography>

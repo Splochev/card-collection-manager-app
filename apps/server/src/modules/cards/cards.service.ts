@@ -18,7 +18,7 @@ import {
 } from '../../interfaces/cards/CardApiResponse.interface';
 import { CardDto } from './dto/card.dto';
 import { CardQueryDto } from './dto/cardQuery.interface';
-import { RARITIES } from './constants';
+import { RARITIES } from '@card-collection-manager-app/shared';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -162,6 +162,7 @@ export class CardsService {
         ce."name" as "name",
         ce."rarities" as "rarities",
         ce."cardId" as "cardId",
+        ce."marketURL" as "marketURL",
         c."type" as "type",
         c."desc" as "desc",
         c."race" as "race",
@@ -450,6 +451,7 @@ export class CardsService {
       .leftJoinAndSelect('uc.cardEditionId', 'ce')
       .leftJoin('ce.cards', 'c')
       .addSelect([
+        'ce.marketURL',
         'c.id',
         'c.name',
         'c.type',
@@ -499,6 +501,7 @@ export class CardsService {
           id: number;
           cardNumber: string;
           cardSetName: string;
+          marketURL?: string | null;
           name: string;
           rarities: string[];
           cardId: number;
@@ -573,6 +576,7 @@ export class CardsService {
         level: cardEdition.cards.level,
         attribute: cardEdition.cards.attribute,
         linkval: cardEdition.cards.linkval,
+        marketURL: cardEdition.marketURL,
         linkmarkers: cardEdition.cards.linkmarkers,
         pend_desc: cardEdition.cards.pend_desc,
         monster_desc: cardEdition.cards.monster_desc,

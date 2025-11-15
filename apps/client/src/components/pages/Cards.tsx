@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import { Button } from '@mui/material';
 import type { ICard } from '../../interfaces/card.interface';
 import SDK from '../../sdk/SDK';
-import { CARD_SET_CODE_REGEX, ELEMENT_IDS } from '../../constants';
+import { BACKEND_URL, CARD_SET_CODE_REGEX, ELEMENT_IDS } from '../../constants';
 import {
   setCardsData,
   clearCardsData,
@@ -23,26 +23,21 @@ import CardsLoadingScreen from '../organisms/cards/CardsLoadingScreen';
 import CardListLoadingSkeleton from '../organisms/cards/CardListLoadingSkeleton';
 
 const CardListFromSet = lazy(
-  () => import('../organisms/cards/CardListFromSet')
+  () => import('../organisms/cards/CardListFromSet'),
 );
-
-const VITE_REACT_LOCAL_BACKEND_URL = import.meta.env
-  .VITE_REACT_LOCAL_BACKEND_URL;
-if (!VITE_REACT_LOCAL_BACKEND_URL)
-  throw new Error('VITE_REACT_LOCAL_BACKEND_URL is not defined');
 
 interface CardsProps {
   socketId: string;
 }
 
 const Cards = ({ socketId }: CardsProps) => {
-  const sdk = SDK.getInstance(VITE_REACT_LOCAL_BACKEND_URL);
+  const sdk = SDK.getInstance(BACKEND_URL);
   const dispatch = useDispatch();
   const { cardNumber: urlCardNumber } = useParams<{ cardNumber?: string }>();
 
   const cardsList = useSelector((state: RootState) => state.cards.cardsList);
   const cardSetPrefixInStore = useSelector(
-    (state: RootState) => state.cards.cardSetPrefix
+    (state: RootState) => state.cards.cardSetPrefix,
   );
 
   const [searchedCard, setSearchedCard] = useState<ICard | null>(null);
@@ -66,7 +61,8 @@ const Cards = ({ socketId }: CardsProps) => {
     if (searchedCard && cardsList.length > 0) {
       const updatedCard = cardsList.find(
         (c) =>
-          c.cardNumber?.toUpperCase() === searchedCard.cardNumber?.toUpperCase()
+          c.cardNumber?.toUpperCase() ===
+          searchedCard.cardNumber?.toUpperCase(),
       );
       if (
         updatedCard &&
@@ -85,17 +81,17 @@ const Cards = ({ socketId }: CardsProps) => {
             cardSetNames: [cardSetNameValue],
             cardSetCode: urlCardNumber || '',
           },
-          socketId
+          socketId,
         );
         toast.success(
-          'Started search — you will be notified when it finishes.'
+          'Started search — you will be notified when it finishes.',
         );
       } catch (error) {
         console.error('Error fetching card set:', error);
         toast.error('Failed to start search. Please try again.');
       }
     },
-    [sdk.cardsManager, socketId, urlCardNumber]
+    [sdk.cardsManager, socketId, urlCardNumber],
   );
 
   useEffect(() => {
@@ -121,7 +117,8 @@ const Cards = ({ socketId }: CardsProps) => {
         if (cardSetPrefixInStore === setCodePrefix && cardsList.length > 0) {
           setIsLoading(false);
           const cardInList = cardsList.find(
-            (c) => c?.cardNumber?.toUpperCase() === normalizedCode.toUpperCase()
+            (c) =>
+              c?.cardNumber?.toUpperCase() === normalizedCode.toUpperCase(),
           );
           if (cardInList) {
             setSearchedCard(cardInList);
@@ -137,14 +134,14 @@ const Cards = ({ socketId }: CardsProps) => {
         const cards = await sdk.cardsManager.getCardsBySetCode(normalizedCode);
 
         const validCards = cards.filter(
-          (c): c is ICard => c != null && c.cardNumber != null
+          (c): c is ICard => c != null && c.cardNumber != null,
         );
 
         dispatch(
-          setCardsData({ cardSetPrefix: setCodePrefix, cardsList: validCards })
+          setCardsData({ cardSetPrefix: setCodePrefix, cardsList: validCards }),
         );
         const searchedCard = validCards.find(
-          (c) => c.cardNumber.toUpperCase() === normalizedCode.toUpperCase()
+          (c) => c.cardNumber.toUpperCase() === normalizedCode.toUpperCase(),
         );
         if (!searchedCard) {
           toast.error('Card not found in the fetched set.');
@@ -183,16 +180,16 @@ const Cards = ({ socketId }: CardsProps) => {
       const quantityToAdd = Number(quantity);
       await sdk.cardsManager.addCardToCollection(
         searchedCard.cardNumber,
-        quantityToAdd
+        quantityToAdd,
       );
 
       dispatch(
-        updateCardCount({ cardId: searchedCard.id, count: quantityToAdd })
+        updateCardCount({ cardId: searchedCard.id, count: quantityToAdd }),
       );
       setSearchedCard({ ...searchedCard, count: quantityToAdd });
 
       toast.success(
-        `New quantity set to your collection: ${quantityToAdd} x ${searchedCard.name}`
+        `New quantity set to your collection: ${quantityToAdd} x ${searchedCard.name}`,
       );
     } catch (error) {
       console.error('Error adding card to collection:', error);
@@ -205,7 +202,7 @@ const Cards = ({ socketId }: CardsProps) => {
     try {
       await sdk.cardsManager.addCardToWishlist(
         searchedCard.cardNumber,
-        wishlistQuantity
+        wishlistQuantity,
       );
 
       setSearchedCard({
@@ -217,11 +214,11 @@ const Cards = ({ socketId }: CardsProps) => {
         updateCardWishlist({
           cardNumber: searchedCard.cardNumber,
           wishlistCount: wishlistQuantity,
-        })
+        }),
       );
 
       toast.success(
-        `Added to wishlist: ${wishlistQuantity} x ${searchedCard.name}`
+        `Added to wishlist: ${wishlistQuantity} x ${searchedCard.name}`,
       );
     } catch (error) {
       console.error('Error adding card to wishlist:', error);
@@ -243,7 +240,7 @@ const Cards = ({ socketId }: CardsProps) => {
         updateCardWishlist({
           cardNumber: searchedCard.cardNumber,
           wishlistCount: 0,
-        })
+        }),
       );
 
       toast.success(`Removed from wishlist: ${searchedCard.name}`);
@@ -272,7 +269,7 @@ const Cards = ({ socketId }: CardsProps) => {
           description={`We couldn't find the card set you're looking for. Would you like to\n\rprovide the card set name for the card with set code: ${urlCardNumber}?`}
           callback={() => {
             const searchBar = document.getElementById(
-              ELEMENT_IDS.CARD_SET_NAME_INPUT
+              ELEMENT_IDS.CARD_SET_NAME_INPUT,
             );
             searchBar?.focus();
           }}
@@ -329,7 +326,7 @@ const Cards = ({ socketId }: CardsProps) => {
           description={`Use the search bar above to find cards and add them to your collection.\n\rExplore thousands of cards from different sets and rarities.`}
           callback={() => {
             const searchBar = document.getElementById(
-              ELEMENT_IDS.CARD_SEARCH_INPUT
+              ELEMENT_IDS.CARD_SEARCH_INPUT,
             );
             searchBar?.focus();
           }}

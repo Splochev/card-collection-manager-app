@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Paper from '@mui/material/Paper';
 import {
   Route,
@@ -6,25 +7,75 @@ import {
   useNavigate,
   useLocation,
 } from 'react-router-dom';
+import CardSearchIcon from '../icons/CardSearchIcon';
+import CollectionIcon from '../icons/CollectionIcon';
+import FavoriteIcon from '../icons/FavoriteIcon';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { PAGES, BREAKPOINTS } from '../../constants';
+import { BREAKPOINTS, BACKEND_URL } from '../../constants';
 import BottomNavigation from '../organisms/layout/BottomNavigation';
 import TopNavigation from '../organisms/layout/TopNavigation';
 import { useState, Suspense, lazy, useEffect, useRef } from 'react';
 import Grid from '@mui/material/Grid';
 import { io, type Socket } from 'socket.io-client';
 import { toast } from 'react-toastify';
-import { Button, Typography } from '@mui/material';
 import AppLoadingScreen from '../organisms/shared/AppLoadingScreen';
+import SearchCardSetFinished from '../toasts/SearchCardSetFinished';
 
-const Collection = lazy(() => import('../pages/Collection'));
-const Cards = lazy(() => import('../pages/Cards'));
-const Wishlist = lazy(() => import('../pages/Wishlist'));
+export const PAGES: readonly PageConfig[] = [
+  {
+    label: 'cards',
+    path: '/cards',
+    param: 'cardNumber',
+    component: lazy(() => import('../pages/Cards')),
+    searchLabel: 'Find cards by set number',
+    icon: CardSearchIcon,
+  },
+  {
+    label: 'collection',
+    path: '/collection',
+    component: lazy(() => import('../pages/Collection')),
+    searchLabel:
+      'Find cards in collection by card name, set number or set name',
+    icon: CollectionIcon,
+  },
+  {
+    label: 'Wishlist',
+    path: '/wishlist',
+    component: lazy(() => import('../pages/Wishlist')),
+    searchLabel: 'Find cards in wishlist by card name, set number or set name',
+    icon: FavoriteIcon,
+  },
+] as const;
 
-const VITE_REACT_LOCAL_BACKEND_URL = import.meta.env
-  .VITE_REACT_LOCAL_BACKEND_URL;
-if (!VITE_REACT_LOCAL_BACKEND_URL)
-  throw new Error('VITE_REACT_LOCAL_BACKEND_URL is not defined');
+const STYLES = {
+  paper: {
+    height: '100vh',
+    width: '100%',
+    borderRadius: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  grid: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'top',
+    gap: { xs: 0, sm: 2 },
+    overflowY: 'auto',
+    overflowX: 'hidden',
+  },
+};
+
+type PageConfig = {
+  label: string;
+  path: string;
+  param?: string;
+  component: React.LazyExoticComponent<React.ComponentType<any>>;
+  searchLabel: string;
+  icon: React.ComponentType<any>;
+};
 
 export default function PageLayout() {
   const isSmDown = useMediaQuery(BREAKPOINTS.SMALL_DOWN);
@@ -33,32 +84,24 @@ export default function PageLayout() {
   const socketIdRef = useRef<string>('');
 
   const [value, setValue] = useState(
-    PAGES.find((page) => location.pathname.includes(page.route))?.index || 0
+    PAGES.findIndex((page) => location.pathname.includes(page.path)),
   );
 
   useEffect(() => {
-    const pageIndex = PAGES.find((page) =>
-      location.pathname.includes(page.route)
-    )?.index;
-    if (pageIndex !== undefined && pageIndex !== value) {
-      setValue(pageIndex);
-    }
+    const pIndex = PAGES.findIndex((p) => location.pathname.includes(p.path));
+    if (pIndex >= 0 && pIndex !== value) setValue(pIndex);
   }, [location.pathname, value]);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     const page = PAGES[newValue];
     if (page) {
       setValue(newValue);
-      navigate(page.route);
+      navigate(page.path);
     }
   };
 
-  const isValidRoute = PAGES.some((page) =>
-    location.pathname.includes(page.route)
-  );
-
   useEffect(() => {
-    const socket: Socket = io(`${VITE_REACT_LOCAL_BACKEND_URL}/card-manager`);
+    const socket: Socket = io(`${BACKEND_URL}/card-manager`);
 
     socket.on('connect', () => {
       socketIdRef.current = socket.id ?? '';
@@ -68,23 +111,13 @@ export default function PageLayout() {
       'searchCardSetFinished',
       async (payload: { collectionName: string; cardSetCode: string }) => {
         toast.success(
-          <Grid
-            sx={{ display: 'flex', gap: 1, alignItems: 'start', marginTop: 1 }}
-          >
-            <Typography variant="body2">
-              Finished search for "{payload.collectionName}".
-            </Typography>
-            <Button
-              variant="text"
-              href={`/cards/${payload.cardSetCode}`}
-              sx={{ width: 80 }}
-            >
-              View
-            </Button>
-          </Grid>,
-          { autoClose: 8000 }
+          <SearchCardSetFinished
+            collectionName={payload.collectionName}
+            cardSetCode={payload.cardSetCode}
+          />,
+          { autoClose: 8000 },
         );
-      }
+      },
     );
 
     return () => {
@@ -94,16 +127,7 @@ export default function PageLayout() {
   }, []);
 
   return (
-    <Paper
-      sx={{
-        height: '100vh',
-        width: '100%',
-        borderRadius: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}
-    >
+    <Paper sx={STYLES.paper}>
       <TopNavigation
         isSmDown={isSmDown}
         value={value}
@@ -111,49 +135,31 @@ export default function PageLayout() {
       />
       <Grid
         sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          justifyContent: 'center',
-          alignItems: 'top',
-          gap: { xs: 0, sm: 2 },
+          ...STYLES.grid,
           height: `calc(100vh - ${isSmDown ? '120px' : '60px'})`,
-          overflowY: 'auto',
-          overflowX: 'hidden',
         }}
       >
-        {!isValidRoute && <Navigate to="/cards" replace />}
+        {!PAGES.some((page) => location.pathname.includes(page.path)) && (
+          <Navigate to="/cards" replace />
+        )}
         <Routes>
-          <Route
-            path="/cards/:cardNumber?"
-            element={
-              <Suspense
-                fallback={<AppLoadingScreen label="Loading cards..." />}
-              >
-                <Cards socketId={socketIdRef.current} />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/collection"
-            element={
-              <Suspense
-                fallback={<AppLoadingScreen label="Loading collection..." />}
-              >
-                <Collection />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/wishlist"
-            element={
-              <Suspense
-                fallback={<AppLoadingScreen label="Loading wishlist..." />}
-              >
-                <Wishlist />
-              </Suspense>
-            }
-          />
+          {PAGES.map((route) => {
+            return (
+              <Route
+                key={route.label}
+                path={`${route.path}${route.param ? `/:${route.param}?` : ''}`}
+                element={
+                  <Suspense
+                    fallback={
+                      <AppLoadingScreen label={`Loading ${route.label}...`} />
+                    }
+                  >
+                    <route.component socketId={socketIdRef.current} />
+                  </Suspense>
+                }
+              />
+            );
+          })}
         </Routes>
       </Grid>
       {isSmDown && (

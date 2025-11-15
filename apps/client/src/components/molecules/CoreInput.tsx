@@ -5,17 +5,6 @@ import FormControl from '@mui/material/FormControl';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 
-interface InputAdornmentsProps {
-  value?: string | number;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  label?: string;
-  startIcon?: React.ReactNode;
-  endIcon?: React.ReactNode;
-  type?: string;
-  responsive?: boolean;
-  id?: string;
-}
-
 const InputContainer = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -40,6 +29,17 @@ const StyledInputBase = styled(OutlinedInput)(({ theme }) => ({
     padding: theme.spacing(1, 1, 1, 0),
   },
 }));
+
+interface InputAdornmentsProps {
+  value?: string | number;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  label?: string;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
+  type?: string;
+  responsive?: boolean;
+  id?: string;
+}
 
 export default function CoreInput({
   label,

@@ -3,6 +3,12 @@ import { useState } from 'react';
 import WishlistManager from '../organisms/cards/WishlistManager';
 import type { ICard } from '../../interfaces/card.interface';
 
+const STYLES = {
+  cardWrapper: { position: 'relative', width: '100%', overflow: 'hidden' },
+  image: { width: '100%', height: 'auto', borderRadius: 12 },
+  box: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 },
+};
+
 interface CardWrapperProps {
   url?: string;
   name?: string;
@@ -23,27 +29,10 @@ const CardWrapper = ({
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
-      <img
-        src={url}
-        alt={name}
-        style={{
-          width: '100%',
-          maxWidth: width,
-          height: 'auto',
-          borderRadius: 12,
-        }}
-      />
+    <Box sx={STYLES.cardWrapper}>
+      <img src={url} alt={name} style={{ ...STYLES.image, maxWidth: width }} />
       {card && onAddToWishlist && onRemoveFromWishlist && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 10,
-          }}
-        >
+        <Box sx={STYLES.box}>
           <WishlistManager
             card={card}
             onAddToWishlist={onAddToWishlist}

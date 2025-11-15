@@ -1,39 +1,11 @@
-import CardSearchIcon from './components/icons/CardSearchIcon';
-import CollectionIcon from './components/icons/CollectionIcon';
-import FavoriteIcon from './components/icons/FavoriteIcon';
-
 const BACKEND_URL =
   import.meta.env.VITE_REACT_LOCAL_BACKEND_URL || 'http://localhost:8080';
-
-const ROUTES_MAP = {
-  CARDS: '/cards',
-  COLLECTION: '/collection',
-};
-
-const PAGES = [
-  {
-    label: 'Cards',
-    index: 0,
-    route: ROUTES_MAP.CARDS,
-    icon: CardSearchIcon,
-    searchLabel: 'Find cards by set number',
-  },
-  {
-    label: 'Collection',
-    index: 1,
-    route: ROUTES_MAP.COLLECTION,
-    icon: CollectionIcon,
-    searchLabel:
-      'Find cards in collection by card name, set number or set name',
-  },
-  {
-    label: 'Wishlist',
-    index: 2,
-    route: '/wishlist',
-    icon: FavoriteIcon,
-    searchLabel: 'Find cards in wishlist by card name, set number or set name',
-  },
-];
+const LOGTO_RESOURCE = import.meta.env.VITE_LOGTO_RESOURCE;
+const LOGTO_ENDPOINT = import.meta.env.VITE_LOGTO_ENDPOINT;
+const LOGTO_APP_ID = import.meta.env.VITE_LOGTO_APP_ID;
+const LOGTO_REDIRECT_URI = import.meta.env.VITE_LOGTO_REDIRECT_URI;
+const LOGTO_POST_LOGOUT_REDIRECT_URI = import.meta.env
+  .VITE_LOGTO_POST_LOGOUT_REDIRECT_URI;
 
 const CARD_SET_CODE_REGEX = /^[A-Z0-9]{3,6}-[A-Z0-9]{3,6}$/i;
 
@@ -50,11 +22,22 @@ const ELEMENT_IDS = {
   CARD_FILTER_INPUT: 'card-filter',
 } as const;
 
+const ICON_SIZE_MAP = {
+  small: 'h-8',
+  medium: 'h-10',
+  large: 'h-12',
+  xlarge: 'h-24',
+};
+
 export {
   BACKEND_URL,
-  ROUTES_MAP,
-  PAGES,
+  LOGTO_RESOURCE,
+  LOGTO_ENDPOINT,
+  LOGTO_APP_ID,
+  LOGTO_REDIRECT_URI,
+  LOGTO_POST_LOGOUT_REDIRECT_URI,
   CARD_SET_CODE_REGEX,
   BREAKPOINTS,
   ELEMENT_IDS,
+  ICON_SIZE_MAP,
 };

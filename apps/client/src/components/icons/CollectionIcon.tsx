@@ -3,12 +3,7 @@
 import CollectionSvg from '../../assets/collection.svg?react';
 import { store } from '../../stores/store';
 import { darkTheme, lightTheme } from '../../themes';
-
-const SIZE_MAP = {
-  small: 'h-8',
-  medium: 'h-10',
-  large: 'h-12',
-};
+import { ICON_SIZE_MAP } from '../../constants';
 
 type IconProps = {
   size?: 'small' | 'medium' | 'large' | number;
@@ -19,7 +14,7 @@ const CollectionIcon = ({ size = 'small', color }: IconProps) => {
   return (
     <CollectionSvg
       className={
-        typeof size === 'string' && SIZE_MAP[size] ? SIZE_MAP[size] : ''
+        typeof size === 'string' && ICON_SIZE_MAP[size] ? ICON_SIZE_MAP[size] : ''
       }
       style={{
         fill: 'currentColor',
@@ -29,8 +24,8 @@ const CollectionIcon = ({ size = 'small', color }: IconProps) => {
         color: color
           ? color
           : store.getState().theme.mode === 'light'
-          ? lightTheme.palette.primary.main
-          : darkTheme.palette.primary.main,
+            ? lightTheme.palette.primary.main
+            : darkTheme.palette.primary.main,
       }}
     />
   );

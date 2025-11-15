@@ -2,10 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-  "module": "commonjs",
-  "types": ["node"],
-  "rootDir": "src",
-  "moduleResolution": "node",
+    "module": "commonjs",
+    "types": ["node"],
+    "rootDir": "src",
+    "moduleResolution": "node",
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -13,5 +13,10 @@
     "lib": ["es2021", "dom"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": []
+  "exclude": [],
+  "references": [
+    {
+      "path": "../../libs/shared/tsconfig.lib.json"
+    }
+  ]
 }

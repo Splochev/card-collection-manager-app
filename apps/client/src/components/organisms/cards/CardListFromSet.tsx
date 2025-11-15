@@ -9,7 +9,6 @@ import {
   TextField,
   InputAdornment,
   Box,
-  CircularProgress,
 } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/Launch';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -18,22 +17,16 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../../stores/store';
-import { BREAKPOINTS, ELEMENT_IDS } from '../../../constants';
-import { handleCardmarketUrl } from '../../../utils';
+import { BACKEND_URL, BREAKPOINTS, ELEMENT_IDS } from '../../../constants';
 import WishlistManager from './WishlistManager';
 import SDK from '../../../sdk/SDK';
 import { toast } from 'react-toastify';
 import { updateCardWishlist } from '../../../stores/cardSlice';
 
-const VITE_REACT_LOCAL_BACKEND_URL = import.meta.env
-  .VITE_REACT_LOCAL_BACKEND_URL;
-if (!VITE_REACT_LOCAL_BACKEND_URL)
-  throw new Error('VITE_REACT_LOCAL_BACKEND_URL is not defined');
-
 const CardListFromSet = () => {
   const cardsList = useSelector((state: RootState) => state.cards.cardsList);
   const selectedCardNumber = useSelector(
-    (state: RootState) => state.cards.selectedCardNumber
+    (state: RootState) => state.cards.selectedCardNumber,
   );
 
   const isWideScreen = useMediaQuery(BREAKPOINTS.WIDE_SCREEN);
@@ -85,8 +78,8 @@ const CardListFromSet = () => {
         (card.name?.toLowerCase() || '').includes(search) ||
         (card.cardNumber?.toLowerCase() || '').includes(search) ||
         (card.rarities || []).some((rarity) =>
-          (rarity || '').toLowerCase().includes(search)
-        )
+          (rarity || '').toLowerCase().includes(search),
+        ),
     );
   }, [eligibleCards, filterText]);
 
@@ -150,13 +143,9 @@ const CardListFromSet = () => {
 const CardItem = memo(({ card }: { card: ICard }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const sdk = SDK.getInstance(VITE_REACT_LOCAL_BACKEND_URL);
-  const dontAskCardmarket = useSelector(
-    (state: RootState) => state.user.dontAskCardmarket
-  );
+  const sdk = SDK.getInstance(BACKEND_URL);
   const [localCard, setLocalCard] = useState<ICard>(card);
   const [showWishlistInput, setShowWishlistInput] = useState(false);
-  const [loadingCardmarket, setLoadingCardmarket] = useState(false);
 
   // Sync localCard when card prop changes (e.g., from Redux updates)
   useEffect(() => {
@@ -168,29 +157,11 @@ const CardItem = memo(({ card }: { card: ICard }) => {
     navigate(`/cards/${card.cardNumber}`);
   };
 
-  const handleCardmarketClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!card?.cardNumber) return;
-
-    setLoadingCardmarket(true);
-    try {
-      await handleCardmarketUrl(
-        card.cardNumber,
-        sdk,
-        dispatch,
-        dontAskCardmarket
-      );
-    } finally {
-      setLoadingCardmarket(false);
-    }
-  };
-
   const handleAddToWishlist = async (wishlistQuantity: number) => {
     try {
       await sdk.cardsManager.addCardToWishlist(
         localCard.cardNumber,
-        wishlistQuantity
+        wishlistQuantity,
       );
 
       setLocalCard({
@@ -202,11 +173,11 @@ const CardItem = memo(({ card }: { card: ICard }) => {
         updateCardWishlist({
           cardNumber: localCard.cardNumber,
           wishlistCount: wishlistQuantity,
-        })
+        }),
       );
 
       toast.success(
-        `Added to wishlist: ${wishlistQuantity} x ${localCard.name}`
+        `Added to wishlist: ${wishlistQuantity} x ${localCard.name}`,
       );
     } catch (error) {
       console.error('Error adding card to wishlist:', error);
@@ -227,7 +198,7 @@ const CardItem = memo(({ card }: { card: ICard }) => {
         updateCardWishlist({
           cardNumber: localCard.cardNumber,
           wishlistCount: 0,
-        })
+        }),
       );
 
       toast.success(`Removed from wishlist: ${localCard.name}`);
@@ -292,15 +263,12 @@ const CardItem = memo(({ card }: { card: ICard }) => {
               }}
             >
               <IconButton
-                onClick={(e) => handleCardmarketClick(e)}
-                disabled={loadingCardmarket}
+                href={card.marketURL}
+                component="a"
+                target="_blank"
                 sx={{ marginTop: '-10px', marginRight: '-10px' }}
               >
-                {loadingCardmarket ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  <ShoppingCartIcon />
-                )}
+                <ShoppingCartIcon />
               </IconButton>
               <IconButton
                 component="a"

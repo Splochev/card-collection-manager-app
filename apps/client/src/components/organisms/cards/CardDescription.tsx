@@ -6,7 +6,7 @@ const CardDescription = ({ desc }: { desc: string }) => {
     desc.includes('[ Monster Effect ]')
   ) {
     const pendulumMatch = desc.match(
-      /\[ Pendulum Effect \](.*?)\[ Monster Effect \]/s
+      /\[ Pendulum Effect \](.*?)\[ Monster Effect \]/s,
     );
     const monsterMatch = desc.match(/\[ Monster Effect \](.*)/s);
     const pendulumText = pendulumMatch ? pendulumMatch[1].trim() : '';

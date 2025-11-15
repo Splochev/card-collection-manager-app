@@ -14,6 +14,18 @@ interface Props {
   onRemoveFromWishlist: () => Promise<void>;
 }
 
+const STYLES = {
+  gridWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+    flex: { xs: '1 1 100%', md: '0 0 25rem' },
+    width: { xs: '100%', md: '25rem' },
+    minWidth: { xs: 0, md: '18em' },
+    maxWidth: { xs: '100%', md: '25rem' },
+  },
+};
+
 const CardImageAndQuantity = ({
   card,
   quantity,
@@ -25,17 +37,7 @@ const CardImageAndQuantity = ({
   const isNotWiderThan900 = useMediaQuery(BREAKPOINTS.NOT_WIDER_THAN_900);
 
   return (
-    <Grid
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 6,
-        flex: { xs: '1 1 100%', md: '0 0 25rem' },
-        width: { xs: '100%', md: '25rem' },
-        minWidth: { xs: 0, md: '18em' },
-        maxWidth: { xs: '100%', md: '25rem' },
-      }}
-    >
+    <Grid sx={STYLES.gridWrapper}>
       {isNotWiderThan900 && <CardInfoHeader card={card} />}
       <CardWrapper
         url={card?.imageUrl || undefined}
