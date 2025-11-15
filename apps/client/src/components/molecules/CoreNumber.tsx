@@ -72,6 +72,7 @@ const CoreNumber = ({
 }: CoreNumberProps) => {
   const [quantity, setQuantity] = useState<number | ''>(value);
   const [lastValid, setLastValid] = useState<number | ''>(value);
+  const lastSentValueRef = useRef<number | ''>(value);
   const holdInterval = useRef<number | null>(null);
   const holdAction = useRef<(() => void) | null>(null);
   const debounceTimerRef = useRef<number | null>(null);
@@ -163,8 +164,10 @@ const CoreNumber = ({
   }, []);
 
   useEffect(() => {
-    setQuantity(value);
-    setLastValid(value);
+    if (lastSentValueRef.current !== value) {
+      setQuantity(value);
+      setLastValid(value);
+    }
   }, [value]);
 
   useEffect(() => {
@@ -174,6 +177,7 @@ const CoreNumber = ({
 
     debounceTimerRef.current = window.setTimeout(() => {
       setValue(quantity);
+      lastSentValueRef.current = quantity; // mark as internally originated
     }, 200);
 
     return () => {
@@ -188,21 +192,33 @@ const CoreNumber = ({
     input?.focus();
   }
 
-  const buttonProps = (position: 'l' | 'r') => ({
-    disabled: quantity === '' || quantity <= min,
-    sx: STYLES.buttonStyle,
-    onMouseDown: () =>
-      startHold(position === 'l' ? handleDecrement : handleIncrement),
-    onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
-      e.preventDefault();
-    },
-    onMouseUp: stopHold,
-    onMouseLeave: stopHold,
-    onTouchStart: () =>
-      startHold(position === 'l' ? handleDecrement : handleIncrement),
-    onTouchEnd: stopHold,
-  });
+  const isAtMin = typeof quantity === 'number' && quantity <= min;
+  const isAtMax = typeof quantity === 'number' && quantity >= max;
+
+  const buttonProps = (position: 'l' | 'r') => {
+    const disabled = quantity === '' || (position === 'l' ? isAtMin : isAtMax);
+    return {
+      disabled,
+      sx: STYLES.buttonStyle,
+      onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (disabled) return;
+        position === 'l' ? handleDecrement() : handleIncrement();
+      },
+      onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (e.button !== 0 || disabled) return;
+        startHold(position === 'l' ? handleDecrement : handleIncrement);
+      },
+      onMouseUp: stopHold,
+      onMouseLeave: stopHold,
+      onTouchStart: () => {
+        if (!disabled)
+          startHold(position === 'l' ? handleDecrement : handleIncrement);
+      },
+      onTouchEnd: stopHold,
+    };
+  };
 
   const iconButtonProps = (isCheck: boolean) => ({
     size: 'small' as const,
@@ -233,6 +249,7 @@ const CoreNumber = ({
               value={quantity}
               onChange={handleInputChange}
               responsive
+              disabled
             />
           </Grid>
           <Button {...buttonProps('r')}>

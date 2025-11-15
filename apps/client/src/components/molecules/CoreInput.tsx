@@ -28,6 +28,16 @@ const StyledInputBase = styled(OutlinedInput)(({ theme }) => ({
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
   },
+  '&.Mui-disabled': {
+    opacity: 1,
+    color: 'inherit',
+    backgroundColor: 'inherit',
+    WebkitTextFillColor: 'inherit',
+    cursor: 'default',
+  },
+  '&.Mui-disabled .MuiInputBase-input': {
+    WebkitTextFillColor: 'inherit',
+  },
 }));
 
 interface InputAdornmentsProps {
@@ -39,6 +49,7 @@ interface InputAdornmentsProps {
   type?: string;
   responsive?: boolean;
   id?: string;
+  disabled?: boolean;
 }
 
 export default function CoreInput({
@@ -50,6 +61,7 @@ export default function CoreInput({
   type = 'text',
   responsive = false,
   id,
+  disabled = false,
 }: InputAdornmentsProps) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -123,6 +135,7 @@ export default function CoreInput({
           onChange={onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
+          disabled={disabled}
           endAdornment={
             !endIcon ? null : (
               <InputAdornment position="end">{endIcon}</InputAdornment>
