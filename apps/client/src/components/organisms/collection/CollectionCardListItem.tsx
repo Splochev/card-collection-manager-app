@@ -1,105 +1,163 @@
+import { Box, Typography, CardContent, Button, Paper } from '@mui/material';
 import {
-  Box,
-  Typography,
-  Card as MuiCard,
-  CardContent,
-  Button,
-  Paper,
-  Dialog,
-  DialogContent,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Remove as RemoveIcon,
   Launch as LaunchIcon,
   ShoppingCart as ShoppingCartIcon,
   ZoomIn as ZoomInIcon,
 } from '@mui/icons-material';
 import type { ICard } from '../../../interfaces/card.interface';
 import SDK from '../../../sdk/SDK';
-import { BACKEND_URL } from '../../../constants';
+import {
+  BACKEND_URL,
+  body1TypographyProps,
+  body2TypographyProps,
+} from '../../../constants';
 import { toast } from 'react-toastify';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateCardCount } from '../../../stores/collectionSlice';
 import { useNavigate } from 'react-router-dom';
-
-interface CollectionCardListItemProps {
-  card: ICard;
-}
+import CoreNumber from '../../molecules/CoreNumber';
 
 const sdk = SDK.getInstance(BACKEND_URL);
 
-const buttonStyle = {
-  minWidth: 0,
-  padding: 0,
-  width: 'fit-content',
-  height: 'fit-content',
-  borderRadius: 1.5,
+const STYLES = {
+  paper0: {
+    display: 'flex',
+    alignItems: 'stretch',
+    marginBottom: 1,
+  },
+  image: {
+    height: 150,
+    objectFit: 'cover',
+    flexShrink: 0,
+    '@media (max-width: 970px)': {
+      height: 180,
+    },
+    '@media (max-width: 750px)': {
+      height: 190,
+    },
+    '@media (max-width: 720px)': {
+      height: 205,
+    },
+    '@media (max-width: 555px)': {
+      height: 225,
+    },
+    '@media (max-width: 500px)': {
+      height: 310,
+    },
+  },
+  cardContent: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    padding: 2,
+    gap: 2,
+    '&:last-child': { paddingBottom: 2 },
+  },
+  row0: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 1.5,
+    '@media (max-width: 750px)': {
+      flexDirection: 'column-reverse',
+      alignItems: 'flex-start',
+    },
+  },
+  actionsWrapper: {
+    display: 'flex',
+    gap: 1,
+    width: '265px',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    '@media (max-width: 750px)': {
+      width: 'fit-content',
+    },
+    '@media (max-width: 500px)': {
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      width: '100%',
+    },
+  },
+  cardTitle: {
+    fontWeight: 'bold',
+    flex: 1,
+    fontSize: 18,
+  },
+  buttonStyle: {
+    minWidth: 0,
+    padding: 0,
+    width: 'fit-content',
+    height: 'fit-content',
+    borderRadius: 1.5,
+  },
+  iconPaper: { padding: 0.5, borderRadius: 1.5 },
+  cardQuantity: {
+    color: 'primary.main',
+    fontWeight: 'bold',
+    fontSize: 20,
+    whiteSpace: 'nowrap',
+    padding: '0 8px',
+    textAlign: 'center',
+  },
+  cardDetails: {
+    color: 'text.secondary',
+    fontSize: 14,
+  },
+  rarityAndCardTypeWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  rarity: {
+    color: 'primary.main',
+    fontSize: 14,
+  },
+  cardType: {
+    color: 'text.secondary',
+    fontSize: 14,
+  },
+  coreNumberWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1,
+    '@media (max-width: 500px)': {
+      justifyContent: 'space-between',
+      width: '130px',
+    },
+  },
+  buttonsWrapper: {
+    display: 'flex',
+    gap: 1,
+    '@media (max-width: 500px)': {
+      justifyContent: 'space-between',
+      width: '130px',
+    },
+  },
 };
 
-const CollectionCardListItem = ({ card }: CollectionCardListItemProps) => {
+const iconPaperProps = {
+  elevation: 4,
+  sx: STYLES.iconPaper,
+};
+
+const CollectionCardListItem = ({
+  card,
+  onZoomIn,
+}: {
+  card: ICard;
+  onZoomIn: (card: ICard | null) => void;
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [localCount, setLocalCount] = useState(card.count);
-  const [zoomOpen, setZoomOpen] = useState(false);
-  const holdInterval = useRef<number | null>(null);
-  const holdAction = useRef<(() => void) | null>(null);
-  const debounceTimerRef = useRef<number | null>(null);
+  const [visibleCount, setVisibleCount] = useState(card.count);
 
   const handleNavigate = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate(`/cards/${card.cardNumber}`);
-  };
-
-  const handleZoomOpen = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setZoomOpen(true);
-  };
-
-  const handleZoomClose = () => setZoomOpen(false);
-
-  const handleDecrement = () => {
-    setLocalCount((prev) => Math.max(0, prev - 1));
-  };
-
-  const handleIncrement = () => {
-    setLocalCount((prev) => prev + 1);
-  };
-
-  const startHold = (action: () => void) => {
-    if (holdInterval.current) {
-      clearInterval(holdInterval.current);
-    }
-
-    holdAction.current = action;
-    action();
-
-    let speed = 120;
-    let elapsed = 0;
-
-    holdInterval.current = window.setInterval(() => {
-      elapsed += speed;
-
-      if (holdAction.current) holdAction.current();
-
-      if (elapsed >= 1500 && speed === 120) {
-        speed = 40;
-        clearInterval(holdInterval.current!);
-        holdInterval.current = window.setInterval(() => {
-          if (holdAction.current) holdAction.current();
-        }, speed);
-      }
-    }, speed);
-  };
-
-  const stopHold = () => {
-    if (holdInterval.current) {
-      clearInterval(holdInterval.current);
-      holdInterval.current = null;
-      holdAction.current = null;
-    }
   };
 
   useEffect(() => {
@@ -107,11 +165,7 @@ const CollectionCardListItem = ({ card }: CollectionCardListItemProps) => {
   }, [card.count]);
 
   useEffect(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = window.setTimeout(async () => {
+    const updateCard = async () => {
       if (localCount !== card.count) {
         try {
           await sdk.cardsManager.addCardToCollection(
@@ -137,211 +191,100 @@ const CollectionCardListItem = ({ card }: CollectionCardListItemProps) => {
           setLocalCount(card.count);
         }
       }
-    }, 500);
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
     };
+    updateCard();
   }, [localCount, card.count, card.cardNumber, card.id, card.name, dispatch]);
 
-  useEffect(() => {
-    return () => {
-      if (holdInterval.current) {
-        clearInterval(holdInterval.current);
-      }
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, []);
+  const buttons = [
+    {
+      props: {
+        sx: STYLES.buttonStyle,
+        href: card.marketURL,
+        component: 'a',
+        target: '_blank',
+      },
+      icon: <ShoppingCartIcon />,
+      isVisible: true,
+    },
+    {
+      props: {
+        sx: STYLES.buttonStyle,
+        component: 'a',
+        href: `/cards/${card.cardNumber}`,
+        onClick: handleNavigate,
+      },
+      icon: <LaunchIcon />,
+      isVisible: true,
+    },
+    {
+      props: {
+        sx: STYLES.buttonStyle,
+        onClick: () => onZoomIn(card),
+        'aria-label': 'Zoom in',
+      },
+      icon: <ZoomInIcon />,
+    },
+  ];
 
   return (
-    <>
-      <MuiCard
-        sx={{
-          display: 'flex',
-          marginBottom: 1,
-          transition: 'box-shadow 0.2s',
-          '&:hover': {
-            boxShadow: 4,
-          },
-        }}
-      >
-        <Box
-          component="img"
-          src={card.imageUrl || ''}
-          alt={card.name}
-          sx={{
-            width: { xs: 60, sm: 80 },
-            height: { xs: 87, sm: 116 },
-            objectFit: 'cover',
-            flexShrink: 0,
-          }}
-        />
-        <CardContent
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: { xs: 1, sm: 2 },
-            '&:last-child': { paddingBottom: { xs: 1, sm: 2 } },
-          }}
-        >
-          <Box>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                gap: 2,
-                marginBottom: 0.5,
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontSize: { xs: '0.9rem', sm: '1.1rem' },
-                  fontWeight: 'bold',
-                  flex: 1,
-                }}
-              >
-                {card.name}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Button
-                  disabled={localCount === 0}
-                  sx={buttonStyle}
-                  onMouseDown={() => startHold(handleDecrement)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                  }}
-                  onMouseUp={stopHold}
-                  onMouseLeave={stopHold}
-                  onTouchStart={() => startHold(handleDecrement)}
-                  onTouchEnd={stopHold}
-                >
-                  <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                    <RemoveIcon fontSize="small" />
-                  </Paper>
-                </Button>
-                <Typography
-                  variant="h5"
-                  color="primary"
-                  sx={{
-                    fontWeight: 'bold',
-                    fontSize: { xs: '1.3rem', sm: '1.5rem' },
-                    whiteSpace: 'nowrap',
-                    minWidth: '50px',
-                    textAlign: 'center',
-                  }}
-                >
-                  {localCount}x
-                </Typography>
-                <Button
-                  sx={buttonStyle}
-                  onMouseDown={() => startHold(handleIncrement)}
-                  onMouseUp={stopHold}
-                  onMouseLeave={stopHold}
-                  onTouchStart={() => startHold(handleIncrement)}
-                  onTouchEnd={stopHold}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                  }}
-                >
-                  <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                    <AddIcon fontSize="small" />
-                  </Paper>
-                </Button>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
-                <Button
-                  sx={buttonStyle}
-                  href={card.marketURL}
-                  component="a"
-                  target="_blank"
-                >
-                  <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                    <ShoppingCartIcon fontSize="small" />
-                  </Paper>
-                </Button>
-                <Button
-                  sx={buttonStyle}
-                  component="a"
-                  href={`/cards/${card.cardNumber}`}
-                  onClick={handleNavigate}
-                >
-                  <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                    <LaunchIcon fontSize="small" />
-                  </Paper>
-                </Button>
-                <Button
-                  sx={buttonStyle}
-                  onClick={handleZoomOpen}
-                  aria-label="Zoom in"
-                >
-                  <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                    <ZoomInIcon fontSize="small" />
-                  </Paper>
-                </Button>
-              </Box>
-            </Box>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ marginBottom: 0.5 }}
-            >
-              {card.cardNumber} - {card.cardSetName}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
+    <Paper elevation={4} sx={STYLES.paper0}>
+      <Box
+        component="img"
+        src={card.imageUrl || ''}
+        alt={card.name}
+        sx={STYLES.image}
+      />
+      <CardContent sx={STYLES.cardContent}>
+        <Box sx={STYLES.row0}>
+          <Typography
+            {...body2TypographyProps}
+            sx={STYLES.cardTitle}
+            title={card.name}
           >
-            {card.rarities && card.rarities.length > 0 && (
-              <Typography variant="body2" color="primary">
-                {card.rarities.join(', ')}
-              </Typography>
-            )}
-            {card.humanReadableCardType && (
-              <Typography variant="caption" color="text.secondary">
-                {card.humanReadableCardType}
-              </Typography>
-            )}
+            {card.name}
+          </Typography>
+          <Box sx={STYLES.actionsWrapper}>
+            <Box sx={STYLES.coreNumberWrapper}>
+              <CoreNumber
+                min={0}
+                max={100}
+                value={localCount}
+                setValue={(value: number | '') => setLocalCount(Number(value))}
+                variant="incrementAndDecrementOnly"
+                externalOnChange={(value) => setVisibleCount(Number(value))}
+                iconPaperProps={iconPaperProps}
+              >
+                <Typography {...body1TypographyProps} sx={STYLES.cardQuantity}>
+                  {visibleCount}x
+                </Typography>
+              </CoreNumber>
+            </Box>
+            <Box sx={STYLES.buttonsWrapper}>
+              {buttons.map(({ props, icon }, index) => (
+                <Button key={index} {...props}>
+                  <Paper {...iconPaperProps}>{icon}</Paper>
+                </Button>
+              ))}
+            </Box>
           </Box>
-        </CardContent>
-      </MuiCard>
-      <Dialog open={zoomOpen} onClose={handleZoomClose} maxWidth="sm" fullWidth>
-        <DialogContent
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: '#222',
-          }}
-        >
-          <Box
-            component="img"
-            src={card.imageUrl || ''}
-            alt={card.name}
-            sx={{
-              maxWidth: '100%',
-              maxHeight: '70vh',
-              borderRadius: 2,
-              boxShadow: 6,
-              background: '#222',
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+        </Box>
+        <Typography {...body2TypographyProps} sx={STYLES.cardDetails}>
+          {card.cardNumber} - {card.cardSetName}
+        </Typography>
+        <Box sx={STYLES.rarityAndCardTypeWrapper}>
+          {card.rarities && card.rarities.length > 0 && (
+            <Typography {...body2TypographyProps} sx={STYLES.rarity}>
+              {card.rarities.join(', ')}
+            </Typography>
+          )}
+          {card.humanReadableCardType && (
+            <Typography variant="caption" sx={STYLES.cardType}>
+              {card.humanReadableCardType}
+            </Typography>
+          )}
+        </Box>
+      </CardContent>
+    </Paper>
   );
 };
 

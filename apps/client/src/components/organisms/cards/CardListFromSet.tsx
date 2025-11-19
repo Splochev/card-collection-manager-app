@@ -17,11 +17,104 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../../stores/store';
-import { BACKEND_URL, BREAKPOINTS, ELEMENT_IDS } from '../../../constants';
+import {
+  BACKEND_URL,
+  BREAKPOINTS,
+  ELEMENT_IDS,
+  body1TypographyProps,
+  body2TypographyProps,
+} from '../../../constants';
 import WishlistManager from './WishlistManager';
 import SDK from '../../../sdk/SDK';
 import { toast } from 'react-toastify';
 import { updateCardWishlist } from '../../../stores/cardSlice';
+
+const STYLES = {
+  noCardsText: { textAlign: 'center', padding: 2 },
+  iconButton: { marginTop: '-10px', marginRight: '-10px' },
+  cardDataBold: {
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  cardName: {
+    textWrap: 'wrap',
+    maxWidth: '12rem',
+    textAlign: 'right',
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  paper0: {
+    width: '100%',
+    padding: 2,
+    borderRadius: 3,
+    gap: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  box0: { flexShrink: 0 },
+  cardImage: {
+    width: '6rem',
+    height: 'auto',
+    borderRadius: 12,
+  },
+  grid0: {
+    width: '100%',
+    borderRadius: 3,
+    gap: 2,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  grid1: { width: '100%', height: '100%' },
+  grid2: {
+    width: '100%',
+    justifyContent: 'flex-end',
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: 2,
+  },
+  grid3: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'baseline',
+    gap: 2,
+  },
+  grid4: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'baseline',
+  },
+  grid5: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'baseline',
+  },
+  grid6: { width: '100%', height: '100%' },
+  grid7: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+    maxWidth: { xs: '100%', md: '35rem' },
+    minWidth: { xs: 0, sm: '21rem' },
+    paddingBottom: 2,
+    flex: { xs: '1 1 100%', md: '0 0 35rem' },
+    width: { xs: '100%', md: '35rem' },
+  },
+  grid8: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+    width: '100%',
+    padding: { xs: 0, sm: 2 },
+  },
+};
 
 const CardListFromSet = () => {
   const cardsList = useSelector((state: RootState) => state.cards.cardsList);
@@ -84,18 +177,7 @@ const CardListFromSet = () => {
   }, [eligibleCards, filterText]);
 
   return (
-    <Grid
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        maxWidth: { xs: '100%', md: '35rem' },
-        minWidth: { xs: 0, sm: '21rem' },
-        paddingBottom: 2,
-        flex: { xs: '1 1 100%', md: '0 0 35rem' },
-        width: { xs: '100%', md: '35rem' },
-      }}
-    >
+    <Grid sx={STYLES.grid7}>
       <Typography variant="h6">Other Cards from set</Typography>
       <TextField
         label="Find cards"
@@ -115,11 +197,7 @@ const CardListFromSet = () => {
       />
       <Grid
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
-          width: '100%',
-          padding: { xs: 0, sm: 2 },
+          ...STYLES.grid8,
           ...(isWideScreen && {
             overflowY: 'auto',
             maxHeight: 'calc(100vh - 220px)',
@@ -127,7 +205,7 @@ const CardListFromSet = () => {
         }}
       >
         {displayedCards.length === 0 && filterText.trim() !== '' ? (
-          <Typography variant="body1" sx={{ textAlign: 'center', padding: 2 }}>
+          <Typography {...body1TypographyProps} sx={STYLES.noCardsText}>
             No cards found matching your search.
           </Typography>
         ) : (
@@ -147,7 +225,6 @@ const CardItem = memo(({ card }: { card: ICard }) => {
   const [localCard, setLocalCard] = useState<ICard>(card);
   const [showWishlistInput, setShowWishlistInput] = useState(false);
 
-  // Sync localCard when card prop changes (e.g., from Redux updates)
   useEffect(() => {
     setLocalCard(card);
   }, [card]);
@@ -157,116 +234,68 @@ const CardItem = memo(({ card }: { card: ICard }) => {
     navigate(`/cards/${card.cardNumber}`);
   };
 
-  const handleAddToWishlist = async (wishlistQuantity: number) => {
+  const onWishlistChange = async (wishlistQuantity?: number) => {
     try {
-      await sdk.cardsManager.addCardToWishlist(
+      await sdk.cardsManager.onWishlistChange(
         localCard.cardNumber,
         wishlistQuantity,
       );
 
       setLocalCard({
         ...localCard,
-        wishlistCount: wishlistQuantity,
+        wishlistCount: wishlistQuantity || 0,
       });
 
       dispatch(
         updateCardWishlist({
           cardNumber: localCard.cardNumber,
-          wishlistCount: wishlistQuantity,
+          wishlistCount: wishlistQuantity || 0,
         }),
       );
 
       toast.success(
-        `Added to wishlist: ${wishlistQuantity} x ${localCard.name}`,
+        wishlistQuantity
+          ? `Added to wishlist: ${wishlistQuantity} x ${localCard.name}`
+          : `Removed from wishlist: ${localCard.name}`,
       );
     } catch (error) {
-      console.error('Error adding card to wishlist:', error);
-      toast.error('Failed to add card to wishlist. Please try again.');
-    }
-  };
-
-  const handleRemoveFromWishlist = async () => {
-    try {
-      await sdk.cardsManager.removeCardFromWishlist(localCard.cardNumber);
-
-      setLocalCard({
-        ...localCard,
-        wishlistCount: 0,
-      });
-
-      dispatch(
-        updateCardWishlist({
-          cardNumber: localCard.cardNumber,
-          wishlistCount: 0,
-        }),
+      console.error(
+        wishlistQuantity
+          ? 'Error adding card to wishlist:'
+          : 'Error removing card from wishlist:',
+        error,
       );
-
-      toast.success(`Removed from wishlist: ${localCard.name}`);
-    } catch (error) {
-      console.error('Error removing card from wishlist:', error);
-      toast.error('Failed to remove card from wishlist. Please try again.');
+      toast.error(
+        wishlistQuantity
+          ? 'Failed to add card to wishlist. Please try again.'
+          : 'Failed to remove card from wishlist. Please try again.',
+      );
     }
   };
 
   return (
-    <Paper
-      elevation={6}
-      sx={{
-        width: '100%',
-        padding: 2,
-        borderRadius: 3,
-        gap: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}
-    >
-      <Grid
-        sx={{
-          width: '100%',
-          borderRadius: 3,
-          gap: 2,
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Box sx={{ flexShrink: 0 }}>
-          <img
-            src={card?.imageUrl}
-            alt={card?.name}
-            style={{
-              width: '6rem',
-              height: 'auto',
-              borderRadius: 12,
-            }}
-          />
+    <Paper elevation={6} sx={STYLES.paper0}>
+      <Grid sx={STYLES.grid0}>
+        <Box sx={STYLES.box0}>
+          <img src={card?.imageUrl} alt={card?.name} style={STYLES.cardImage} />
         </Box>
-        <Grid sx={{ width: '100%', height: '100%' }}>
+        <Grid sx={STYLES.grid1}>
           {showWishlistInput ? (
             <WishlistManager
               card={localCard}
-              onAddToWishlist={handleAddToWishlist}
-              onRemoveFromWishlist={handleRemoveFromWishlist}
+              onAddToWishlist={onWishlistChange}
+              onRemoveFromWishlist={onWishlistChange}
               variant="full"
               isOpen={showWishlistInput}
               onToggle={() => setShowWishlistInput(!showWishlistInput)}
             />
           ) : (
-            <Grid
-              sx={{
-                width: '100%',
-                justifyContent: 'flex-end',
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: 2,
-              }}
-            >
+            <Grid sx={STYLES.grid2}>
               <IconButton
                 href={card.marketURL}
                 component="a"
                 target="_blank"
-                sx={{ marginTop: '-10px', marginRight: '-10px' }}
+                sx={STYLES.iconButton}
               >
                 <ShoppingCartIcon />
               </IconButton>
@@ -274,88 +303,41 @@ const CardItem = memo(({ card }: { card: ICard }) => {
                 component="a"
                 href={`/cards/${card.cardNumber}`}
                 onClick={handleNavigate}
-                sx={{ marginTop: '-10px', marginRight: '-10px' }}
+                sx={STYLES.iconButton}
               >
                 <LaunchIcon />
               </IconButton>
               <WishlistManager
                 card={localCard}
-                onAddToWishlist={handleAddToWishlist}
-                onRemoveFromWishlist={handleRemoveFromWishlist}
+                onAddToWishlist={onWishlistChange}
+                onRemoveFromWishlist={onWishlistChange}
                 variant="icon-only"
                 isOpen={showWishlistInput}
                 onToggle={() => setShowWishlistInput(!showWishlistInput)}
               />
             </Grid>
           )}
-          <Grid
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%',
-              alignItems: 'baseline',
-              gap: 2,
-            }}
-          >
-            <Typography variant="body2" component="p">
-              Name:
-            </Typography>
-            <Typography
-              variant="body1"
-              component="p"
-              fontWeight="bold"
-              marginBottom={2}
-              sx={{ textWrap: 'wrap', maxWidth: '12rem', textAlign: 'right' }}
-            >
+          <Grid sx={STYLES.grid3}>
+            <Typography {...body2TypographyProps}>Name:</Typography>
+            <Typography {...body1TypographyProps} sx={STYLES.cardName}>
               {card?.name}
             </Typography>
           </Grid>
-          <Grid
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%',
-              alignItems: 'baseline',
-            }}
-          >
-            <Typography variant="body2" component="p">
-              Set Code:
-            </Typography>
-            <Typography
-              variant="body1"
-              component="p"
-              fontWeight="bold"
-              marginBottom={2}
-            >
+          <Grid sx={STYLES.grid5}>
+            <Typography {...body2TypographyProps}>Set Code:</Typography>
+            <Typography {...body1TypographyProps} sx={STYLES.cardDataBold}>
               {card?.cardNumber}
             </Typography>
           </Grid>
-          <Grid
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%',
-              alignItems: 'baseline',
-            }}
-          >
-            <Typography variant="body2" component="p">
-              Quantity:
-            </Typography>
-            <Typography
-              variant="body1"
-              component="p"
-              fontWeight="bold"
-              marginBottom={2}
-            >
+          <Grid sx={STYLES.grid4}>
+            <Typography {...body2TypographyProps}>Quantity:</Typography>
+            <Typography {...body1TypographyProps} sx={STYLES.cardDataBold}>
               {card?.count}
             </Typography>
           </Grid>
         </Grid>
       </Grid>
-      <Grid sx={{ width: '100%', height: '100%' }}>
+      <Grid sx={STYLES.grid6}>
         <Chips labels={card?.rarities || []} width={'100%'} />
       </Grid>
     </Paper>

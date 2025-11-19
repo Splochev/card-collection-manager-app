@@ -8,6 +8,7 @@ import {
   FormControl,
   InputLabel,
   type SelectChangeEvent,
+  useMediaQuery,
 } from '@mui/material';
 import {
   SwapVert as SwapVertIcon,
@@ -26,15 +27,43 @@ import {
   type OrderByType,
   type ViewMode,
 } from '../../../stores/collectionSlice';
+import { useEffect } from 'react';
 
-interface CollectionToolbarProps {
-  onRefresh?: () => void;
-}
+const STYLES = {
+  toolbarContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: { xs: 'flex-start', sm: 'center' },
+    padding: { xs: 1.5, sm: 2 },
+    gap: { xs: 2, sm: 3 },
+    flexDirection: { xs: 'column', sm: 'row' },
+  },
+  leftSide: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: { xs: 1, sm: 1.5, md: 2 },
+    flexWrap: 'nowrap',
+    width: { xs: '100%', sm: 'auto' },
+    flex: { sm: 1 },
+  },
+  selectWrapper: {
+    minWidth: { xs: 100, sm: 130, md: 150 },
+    flex: { xs: 1, sm: '0 1 auto' },
+  },
+  rightSide: {
+    alignSelf: { xs: 'flex-end', sm: 'auto' },
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1,
+  },
+};
 
-const CollectionToolbar = ({ onRefresh }: CollectionToolbarProps) => {
+const CollectionToolbar = ({ onRefresh }: { onRefresh?: () => void }) => {
   const dispatch = useDispatch();
+  const isMobile = useMediaQuery('(max-width:499px)');
+
   const { groupBy, orderBy, sortType, viewMode } = useSelector(
-    (state: RootState) => state.collection
+    (state: RootState) => state.collection,
   );
 
   const handleGroupByChange = (event: SelectChangeEvent) => {
@@ -51,42 +80,23 @@ const CollectionToolbar = ({ onRefresh }: CollectionToolbarProps) => {
 
   const handleViewModeChange = (
     _event: React.MouseEvent<HTMLElement>,
-    newMode: ViewMode | null
+    newMode: ViewMode | null,
   ) => {
     if (newMode !== null) {
       dispatch(setViewMode(newMode));
     }
   };
 
+  useEffect(() => {
+    if (isMobile) {
+      dispatch(setViewMode('grid'));
+    }
+  }, [isMobile, dispatch]);
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: { xs: 'flex-start', sm: 'center' },
-        padding: { xs: 1.5, sm: 2 },
-        gap: { xs: 2, sm: 3 },
-        flexDirection: { xs: 'column', sm: 'row' },
-      }}
-    >
-      {/* Left Side */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: { xs: 1, sm: 1.5, md: 2 },
-          flexWrap: 'nowrap',
-          width: { xs: '100%', sm: 'auto' },
-          flex: { sm: 1 },
-        }}
-      >
-        <FormControl
-          size="small"
-          sx={{
-            minWidth: { xs: 100, sm: 130, md: 150 },
-            flex: { xs: 1, sm: '0 1 auto' },
-          }}
-        >
+    <Box sx={STYLES.toolbarContainer}>
+      <Box sx={STYLES.leftSide}>
+        <FormControl size="small" sx={STYLES.selectWrapper}>
           <InputLabel id="group-by-label">Group by:</InputLabel>
           <Select
             labelId="group-by-label"
@@ -99,14 +109,7 @@ const CollectionToolbar = ({ onRefresh }: CollectionToolbarProps) => {
             <MenuItem value="setCode">Set Code</MenuItem>
           </Select>
         </FormControl>
-
-        <FormControl
-          size="small"
-          sx={{
-            minWidth: { xs: 100, sm: 130, md: 150 },
-            flex: { xs: 1, sm: '0 1 auto' },
-          }}
-        >
+        <FormControl size="small" sx={STYLES.selectWrapper}>
           <InputLabel id="sort-by-label">Sort by:</InputLabel>
           <Select
             labelId="sort-by-label"
@@ -134,18 +137,7 @@ const CollectionToolbar = ({ onRefresh }: CollectionToolbarProps) => {
         >
           <SwapVertIcon />
         </IconButton>
-      </Box>
-
-      {/* Right Side */}
-      <Box
-        sx={{
-          alignSelf: { xs: 'flex-end', sm: 'auto' },
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-        }}
-      >
-        {onRefresh && (
+        {isMobile && onRefresh && (
           <IconButton
             onClick={onRefresh}
             color="primary"
@@ -155,21 +147,35 @@ const CollectionToolbar = ({ onRefresh }: CollectionToolbarProps) => {
             <RefreshIcon />
           </IconButton>
         )}
-        <ToggleButtonGroup
-          value={viewMode}
-          exclusive
-          onChange={handleViewModeChange}
-          aria-label="view mode"
-          size="small"
-        >
-          <ToggleButton value="grid" aria-label="grid view">
-            <GridViewIcon />
-          </ToggleButton>
-          <ToggleButton value="list" aria-label="list view">
-            <ViewListIcon />
-          </ToggleButton>
-        </ToggleButtonGroup>
       </Box>
+      {!isMobile && (
+        <Box sx={STYLES.rightSide}>
+          {onRefresh && (
+            <IconButton
+              onClick={onRefresh}
+              color="primary"
+              size="small"
+              aria-label="refresh collection"
+            >
+              <RefreshIcon />
+            </IconButton>
+          )}
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={handleViewModeChange}
+            aria-label="view mode"
+            size="small"
+          >
+            <ToggleButton value="grid" aria-label="grid view">
+              <GridViewIcon />
+            </ToggleButton>
+            <ToggleButton value="list" aria-label="list view">
+              <ViewListIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      )}
     </Box>
   );
 };

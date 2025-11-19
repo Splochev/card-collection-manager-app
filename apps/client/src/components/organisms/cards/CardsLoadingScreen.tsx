@@ -38,17 +38,22 @@ const STYLES = {
   skeleton400: { height: 400, width: '100%' },
 };
 
+const skeletonProps = {
+  variant: 'rounded' as const,
+  animation: 'wave' as const,
+};
+
 const CardsLoadingScreen = () => {
   return (
     <Grid sx={STYLES.grid0}>
       <Grid sx={STYLES.grid1}>
-        <Skeleton animation="wave" variant="rounded" sx={STYLES.skeleton580} />
-        <Skeleton animation="wave" variant="rounded" sx={STYLES.skeleton140} />
+        <Skeleton {...skeletonProps} sx={STYLES.skeleton580} />
+        <Skeleton {...skeletonProps} sx={STYLES.skeleton140} />
       </Grid>
       <Grid sx={STYLES.grid3}>
-        <Skeleton variant="rounded" sx={STYLES.skeleton80} />
-        <Skeleton variant="rounded" sx={STYLES.skeleton160} />
-        <Skeleton variant="rounded" sx={STYLES.skeleton400} />
+        <Skeleton {...skeletonProps} sx={STYLES.skeleton80} />
+        <Skeleton {...skeletonProps} sx={STYLES.skeleton160} />
+        <Skeleton {...skeletonProps} sx={STYLES.skeleton400} />
       </Grid>
       <CardListLoadingSkeleton />
     </Grid>

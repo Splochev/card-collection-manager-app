@@ -1,13 +1,8 @@
 import logo from '../../assets/logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ICON_SIZE_MAP } from '../../constants';
+import { ICON_SIZE_MAP, IconProps } from '../../constants';
 
-type LogoProps = {
-  size?: 'small' | 'medium' | 'large' | 'xlarge';
-  disableClick?: boolean;
-};
-
-const Logo = ({ size = 'small', disableClick = false }: LogoProps) => {
+const Logo = ({ size = 'small', disableClick = false }: IconProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 

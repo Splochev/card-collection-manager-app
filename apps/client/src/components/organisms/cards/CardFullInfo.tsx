@@ -10,7 +10,6 @@ const STYLES = {
     flexDirection: 'column',
     gap: 4,
     width: '100%',
-    overflowY: 'auto',
     maxWidth: { xs: '100%', md: '35rem' },
     padding: { xs: 0, sm: 2 },
     flex: { xs: '1 1 100%', md: '1 1 35rem' },
@@ -18,12 +17,23 @@ const STYLES = {
   },
 };
 
-const CardFullInfo = ({ card }: { card: ICard | null }) => {
+const CardFullInfo = ({
+  card,
+  removeScroll = false,
+  showAll = false,
+}: {
+  card: ICard | null;
+  removeScroll?: boolean;
+  showAll?: boolean;
+}) => {
   const isWiderThan900 = useMediaQuery('(min-width:901px)');
 
   return (
-    <Grid sx={STYLES.grid}>
-      {isWiderThan900 && <CardInfoHeader card={card} />}
+    <Grid
+      sx={STYLES.grid}
+      style={{ overflowY: removeScroll ? 'visible' : 'auto' }}
+    >
+      {(isWiderThan900 || showAll) && <CardInfoHeader card={card} />}
       <CardSetInfo card={card} />
       <CardStats card={card} />
     </Grid>

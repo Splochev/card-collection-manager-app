@@ -3,6 +3,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { ICard } from '../../../interfaces/card.interface';
 import CardDescription from './CardDescription';
+import { body2TypographyProps, h6TypographyProps } from '../../../constants';
 
 const STYLES = {
   paper: {
@@ -13,26 +14,28 @@ const STYLES = {
     flexDirection: 'column',
     width: '100%',
   },
+  span: { display: 'flex', gap: 8 },
 };
 
 const CardStats = ({ card }: { card: ICard | null }) => {
-  const typeline = card?.typeline
-    ? card.typeline.replace(/["{}]/g, ' ').replace(',', ' / ')
-    : card?.type;
+  console.log(card?.typeline);
+
+  const typeline =
+    card?.typeline && typeof card?.typeline === 'string'
+      ? card.typeline.replace(/["{}]/g, ' ').replace(',', ' / ')
+      : card?.typeline && Array.isArray(card?.typeline)
+        ? card?.typeline.join('').replace(/["{}]/g, ' ').replace(',', ' / ')
+        : card?.type;
   const isMonster = card?.type?.includes('Monster');
   return (
     <Paper elevation={6} sx={STYLES.paper}>
-      <Typography variant="h6" component="p">
-        Card stats
-      </Typography>
+      <Typography {...h6TypographyProps}>Card stats</Typography>
       <Grid container spacing={2} justifyContent={'space-between'}>
-        <Typography variant="body2" component="p">
-          {typeline}
-        </Typography>
+        <Typography {...body2TypographyProps}>{typeline}</Typography>
         <Grid container spacing={2}>
-          <Typography variant="body2" component="p">
+          <Typography {...body2TypographyProps}>
             {card?.level ? (
-              <span style={{ display: 'flex', gap: 8 }}>
+              <span style={STYLES.span}>
                 <span>Level: {card.level}</span>
                 <span>Attribute: {card.attribute}</span>
               </span>
@@ -45,8 +48,8 @@ const CardStats = ({ card }: { card: ICard | null }) => {
       <CardDescription desc={card?.desc || ''} />
       {isMonster && (
         <Grid container spacing={2} justifyContent={'end'}>
-          <Typography variant="body2" component="p">
-            <span style={{ display: 'flex', gap: 8 }}>
+          <Typography {...body2TypographyProps}>
+            <span style={STYLES.span}>
               <span>ATK/ {card?.atk}</span>
               <span>DEF/ {card?.def}</span>
             </span>

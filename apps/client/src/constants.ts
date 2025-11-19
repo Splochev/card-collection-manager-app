@@ -29,6 +29,27 @@ const ICON_SIZE_MAP = {
   xlarge: 'h-24',
 };
 
+const body1TypographyProps = {
+  variant: 'body1' as const,
+  component: 'p' as const,
+};
+
+const body2TypographyProps = {
+  variant: 'body2' as const,
+  component: 'p' as const,
+};
+
+const h6TypographyProps = {
+  variant: 'h6' as const,
+  component: 'p' as const,
+};
+
+type IconProps = {
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
+  color?: 'inherit' | 'primary' | 'secondary';
+  disableClick?: boolean;
+};
+
 export {
   BACKEND_URL,
   LOGTO_RESOURCE,
@@ -40,4 +61,8 @@ export {
   BREAKPOINTS,
   ELEMENT_IDS,
   ICON_SIZE_MAP,
+  body1TypographyProps,
+  body2TypographyProps,
+  h6TypographyProps,
 };
+export type { IconProps };

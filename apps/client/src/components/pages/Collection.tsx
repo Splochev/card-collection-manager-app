@@ -1,6 +1,12 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+} from '@mui/material';
 import type { RootState } from '../../stores/store';
 import {
   setGroups,
@@ -19,12 +25,17 @@ import CollectionCardListItem from '../organisms/collection/CollectionCardListIt
 import EmptyState from '../organisms/shared/EmptyState';
 import Grid from '@mui/material/Grid';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ICard } from '../../interfaces/card.interface';
+import CardInfoHeader from '../organisms/cards/CardInfoHeader';
+import CardFullInfo from '../organisms/cards/CardFullInfo';
+import CardWrapper from '../atoms/CardWrapper';
 
 const sdk = SDK.getInstance(BACKEND_URL);
 
 const Collection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [zoomInCard, setZoomInCard] = useState<ICard | null>(null);
   const [searchParams] = useSearchParams();
   const urlFilter = searchParams.get('filter') || '';
 
@@ -70,7 +81,7 @@ const Collection = () => {
         dispatch(setIsLoading(false));
       }
     },
-    [dispatch, filter, urlFilter, limit, offset, groupBy, orderBy, sortType]
+    [dispatch, filter, urlFilter, limit, offset, groupBy, orderBy, sortType],
   );
 
   const handleRefresh = useCallback(() => {
@@ -92,7 +103,7 @@ const Collection = () => {
           fetchCollection(true);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     const currentTarget = observerTarget.current;
@@ -148,111 +159,153 @@ const Collection = () => {
   }
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-      }}
-    >
-      <CollectionToolbar onRefresh={handleRefresh} />
+    <>
       <Box
         sx={{
-          paddingX: { xs: 1, sm: 2 },
-          paddingBottom: 4,
+          width: '100%',
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
-          overflowY: 'auto',
-          flex: 1,
+          justifyContent: 'flex-start',
         }}
       >
-        <Box sx={{ width: '100%', maxWidth: '1400px' }}>
-          {groups.map((group) => (
-            <Box key={group.groupKey} sx={{ marginBottom: 4 }}>
-              {/* Group Header */}
-              <Typography
-                variant="h5"
-                sx={{
-                  marginBottom: 2,
-                  fontWeight: 'bold',
-                  fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                }}
-              >
-                {group.groupKey}{' '}
+        <CollectionToolbar onRefresh={handleRefresh} />
+        <Box
+          sx={{
+            padding: { xs: 1.5, sm: 2 },
+            paddingBottom: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            width: '100%',
+            overflowY: 'auto',
+            flex: 1,
+          }}
+        >
+          <Box sx={{ width: '100%' }}>
+            {groups.map((group) => (
+              <Box key={group.groupKey} sx={{ marginBottom: 4 }}>
                 <Typography
-                  component="span"
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  ({group.cards.length} card
-                  {group.cards.length !== 1 ? 's' : ''})
-                </Typography>
-              </Typography>
-
-              {/* Cards Grid/List */}
-              {viewMode === 'grid' ? (
-                <Box
+                  variant="h5"
                   sx={{
-                    display: 'grid',
-                    gridTemplateColumns: {
-                      xs: 'repeat(auto-fill, minmax(140px, 1fr))',
-                      sm: 'repeat(auto-fill, minmax(160px, 1fr))',
-                      md: 'repeat(auto-fill, minmax(200px, 1fr))',
-                    },
-                    gap: { xs: 1, sm: 2 },
-                    justifyItems: 'center',
+                    marginBottom: 2,
+                    fontWeight: 'bold',
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
                   }}
                 >
-                  {group.cards.map((card, index) => (
-                    <CollectionCardGridItem
-                      key={`collection-card-grid-item-${card.id}-${card.cardNumber}-${index}`}
-                      card={card}
-                    />
-                  ))}
-                </Box>
-              ) : (
-                <Box>
-                  {group.cards.map((card, index) => (
-                    <CollectionCardListItem
-                      key={`collection-card-list-item-${card.id}-${card.cardNumber}-${index}`}
-                      card={card}
-                    />
-                  ))}
-                </Box>
-              )}
-            </Box>
-          ))}
+                  {group.groupKey}{' '}
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    color="text.secondary"
+                  >
+                    ({group.cards.length} card
+                    {group.cards.length !== 1 ? 's' : ''})
+                  </Typography>
+                </Typography>
 
-          {/* Infinite Scroll Trigger */}
-          <Box
-            ref={observerTarget}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              padding: 3,
-              minHeight: 100,
-            }}
-          >
-            {isLoading && <CircularProgress />}
-          </Box>
+                {/* Cards Grid/List */}
+                {viewMode === 'grid' ? (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 4,
+                      justifyContent: 'start',
+                      '@media (max-width: 715px)': {
+                        gap: 1.5,
+                      },
+                      '@media (max-width: 670px)': {
+                        justifyContent: 'center',
+                        gap: 4,
+                      },
+                      '@media (max-width: 475px)': {
+                        gap: 1.5,
+                      },
+                    }}
+                  >
+                    {group.cards.map((card, index) => (
+                      <CollectionCardGridItem
+                        key={`collection-card-grid-item-${card.id}-${card.cardNumber}-${index}`}
+                        card={card}
+                        onZoomIn={setZoomInCard}
+                      />
+                    ))}
+                  </Box>
+                ) : (
+                  <Box>
+                    {group.cards.map((card, index) => (
+                      <CollectionCardListItem
+                        key={`collection-card-list-item-${card.id}-${card.cardNumber}-${index}`}
+                        card={card}
+                        onZoomIn={setZoomInCard}
+                      />
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            ))}
 
-          {!hasMore && groups.length > 0 && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              textAlign="center"
-              sx={{ marginTop: 2 }}
+            {/* Infinite Scroll Trigger */}
+            <Box
+              ref={observerTarget}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                padding: 3,
+                minHeight: 100,
+              }}
             >
-              You've reached the end of your collection
-            </Typography>
-          )}
+              {isLoading && <CircularProgress />}
+            </Box>
+
+            {!hasMore && groups.length > 0 && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                textAlign="center"
+                sx={{ marginTop: 2 }}
+              >
+                You've reached the end of your collection
+              </Typography>
+            )}
+          </Box>
         </Box>
       </Box>
-    </Box>
+      <Dialog
+        open={Boolean(zoomInCard)}
+        onClose={() => setZoomInCard(null)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#222',
+            overflow: 'visible',
+            gap: 4,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <CardWrapper
+              url={zoomInCard?.imageUrl || undefined}
+              name={zoomInCard?.name || undefined}
+              card={zoomInCard}
+            />
+          </Box>
+          <CardFullInfo card={zoomInCard} removeScroll showAll />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

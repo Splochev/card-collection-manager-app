@@ -1,5 +1,6 @@
 import { Skeleton, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { h6TypographyProps } from '../../../constants';
 
 const STYLES = {
   gridWrapper: {
@@ -30,7 +31,7 @@ const STYLES = {
 const CardListLoadingSkeleton = () => {
   return (
     <Grid sx={STYLES.gridWrapper}>
-      <Typography variant="h6">Other Cards from set</Typography>
+      <Typography {...h6TypographyProps}>Other Cards from set</Typography>
       <Grid sx={STYLES.grid}>
         {Array.from({ length: 4 }).map((_, index) => {
           return (

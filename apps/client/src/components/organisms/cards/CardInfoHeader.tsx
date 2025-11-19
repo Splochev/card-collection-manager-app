@@ -27,9 +27,6 @@ const CardInfoHeader = ({ card }: { card: ICard | null }) => {
         <Typography variant="h5" sx={STYLES.Typography}>
           {card?.name}
         </Typography>
-        <Typography variant="h5" sx={STYLES.Typography}>
-          {card?.name}
-        </Typography>
         {card?.cardSetName && card?.name && (
           <Button
             variant="contained"

@@ -5,15 +5,6 @@ import type { ICard } from '../../../interfaces/card.interface';
 import CardInfoHeader from './CardInfoHeader';
 import { BREAKPOINTS } from '../../../constants';
 
-interface Props {
-  card: ICard | null;
-  quantity: number | '';
-  setQuantity: (val: number | '') => void;
-  onSubmit: () => void;
-  onAddToWishlist: (quantity: number) => Promise<void>;
-  onRemoveFromWishlist: () => Promise<void>;
-}
-
 const STYLES = {
   gridWrapper: {
     display: 'flex',
@@ -25,6 +16,15 @@ const STYLES = {
     maxWidth: { xs: '100%', md: '25rem' },
   },
 };
+
+interface Props {
+  card: ICard | null;
+  quantity: number | '';
+  setQuantity: (val: number | '') => void;
+  onSubmit: () => void;
+  onAddToWishlist: (quantity: number) => Promise<void>;
+  onRemoveFromWishlist: () => Promise<void>;
+}
 
 const CardImageAndQuantity = ({
   card,

@@ -26,7 +26,7 @@ export default class CardsManager {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return data;
   }
@@ -36,7 +36,7 @@ export default class CardsManager {
    */
   async findCardSets(
     body: { cardSetNames: string[]; cardSetCode: string },
-    socketId?: string
+    socketId?: string,
   ): Promise<void> {
     const headers: Record<string, string> = {};
     const token = this.sdk.getToken();
@@ -55,7 +55,7 @@ export default class CardsManager {
    */
   async addCardToCollection(
     cardSetCode: string,
-    quantity: number
+    quantity: number,
   ): Promise<void> {
     const token = this.sdk.getToken();
     await axios.post(
@@ -65,8 +65,22 @@ export default class CardsManager {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
+  }
+
+  /**
+   * Updates the wishlist quantity for a specific card.
+   */
+  async onWishlistChange(
+    cardSetCode: string,
+    quantity?: number,
+  ): Promise<void> {
+    if (quantity && quantity > 0) {
+      await this.addCardToWishlist(cardSetCode, quantity);
+    } else {
+      await this.removeCardFromWishlist(cardSetCode);
+    }
   }
 
   /**
@@ -74,7 +88,7 @@ export default class CardsManager {
    */
   async addCardToWishlist(
     cardSetCode: string,
-    quantity: number
+    quantity: number,
   ): Promise<void> {
     const token = this.sdk.getToken();
     await axios.post(
@@ -84,7 +98,7 @@ export default class CardsManager {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
   }
 
@@ -157,7 +171,7 @@ export default class CardsManager {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     return data;
   }

@@ -1,105 +1,149 @@
 import {
   Box,
   Typography,
-  Card as MuiCard,
   CardContent,
   Button,
   Paper,
-  Dialog,
-  DialogContent,
+  useMediaQuery,
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Remove as RemoveIcon,
   Launch as LaunchIcon,
   ShoppingCart as ShoppingCartIcon,
   ZoomIn as ZoomInIcon,
 } from '@mui/icons-material';
 import type { ICard } from '../../../interfaces/card.interface';
 import SDK from '../../../sdk/SDK';
-import { BACKEND_URL } from '../../../constants';
+import {
+  BACKEND_URL,
+  body1TypographyProps,
+  body2TypographyProps,
+} from '../../../constants';
 import { toast } from 'react-toastify';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateCardCount } from '../../../stores/collectionSlice';
 import { useNavigate } from 'react-router-dom';
+import CoreNumber from '../../molecules/CoreNumber';
 
-interface CollectionCardGridItemProps {
-  card: ICard;
-}
+const STYLES = {
+  paper0: {
+    width: 200,
+    '@media (max-width: 475px)': {
+      width: '48%',
+    },
+
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+    borderRadius: 1,
+    '@media (min-width: 475px)': {
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: 6,
+      },
+    },
+  },
+  imageWrapper: {
+    position: 'relative',
+    paddingTop: '146%',
+    backgroundColor: 'action.hover',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+  },
+  cardImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+  },
+  cardContentWrapper: { padding: 1, '&:last-child': { paddingBottom: 1 } },
+  cardTitle: {
+    fontWeight: 'bold',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    fontSize: 20,
+  },
+  cardNumberAndQuantityWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 0.5,
+  },
+  cardNumber: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    flex: 1,
+    color: 'text.secondary',
+    fontSize: 16,
+  },
+  cardQuantity: {
+    color: 'primary.main',
+    fontWeight: 'bold',
+    marginLeft: 1,
+    fontSize: 20,
+  },
+  actionsWrapper: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 1,
+    '@media (max-width: 475px)': {
+      justifyContent: 'space-around',
+    },
+    '@media (max-width: 445px)': {
+      flexDirection: 'column',
+    },
+  },
+  buttonStyle: {
+    minWidth: 0,
+    padding: 0,
+    width: 'fit-content',
+    height: 'fit-content',
+    borderRadius: 1.5,
+  },
+  iconPaper: { padding: 0.5, borderRadius: 1.5 },
+  mobileActionsWrapper: {
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'space-around',
+    mb: 1.5,
+  },
+};
+
+const iconPaperProps = {
+  elevation: 4,
+  sx: STYLES.iconPaper,
+};
 
 const sdk = SDK.getInstance(BACKEND_URL);
 
-const buttonStyle = {
-  minWidth: 0,
-  padding: 0,
-  width: 'fit-content',
-  height: 'fit-content',
-  borderRadius: 1.5,
-};
+const WrappedBox = ({ children }: { children: React.ReactNode }) => (
+  <Box sx={STYLES.mobileActionsWrapper}>{children}</Box>
+);
 
-const CollectionCardGridItem = ({ card }: CollectionCardGridItemProps) => {
+const CollectionCardGridItem = ({
+  card,
+  onZoomIn,
+}: {
+  card: ICard;
+  onZoomIn: (card: ICard | null) => void;
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [localCount, setLocalCount] = useState(card.count);
-  const [zoomOpen, setZoomOpen] = useState(false);
-  const holdInterval = useRef<number | null>(null);
-  const holdAction = useRef<(() => void) | null>(null);
-  const debounceTimerRef = useRef<number | null>(null);
-
+  const [visibleCount, setVisibleCount] = useState(card.count);
+  const isMobile = useMediaQuery('(max-width:445px)');
+  const Wrapper = isMobile ? WrappedBox : Fragment;
   const handleNavigate = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate(`/cards/${card.cardNumber}`);
-  };
-
-  const handleZoomOpen = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setZoomOpen(true);
-  };
-
-  const handleZoomClose = () => setZoomOpen(false);
-
-  const handleDecrement = () => {
-    setLocalCount((prev) => Math.max(0, prev - 1));
-  };
-
-  const handleIncrement = () => {
-    setLocalCount((prev) => prev + 1);
-  };
-
-  const startHold = (action: () => void) => {
-    if (holdInterval.current) {
-      clearInterval(holdInterval.current);
-    }
-
-    holdAction.current = action;
-    action();
-
-    let speed = 120;
-    let elapsed = 0;
-
-    holdInterval.current = window.setInterval(() => {
-      elapsed += speed;
-
-      if (holdAction.current) holdAction.current();
-
-      if (elapsed >= 1500 && speed === 120) {
-        speed = 40;
-        clearInterval(holdInterval.current!);
-        holdInterval.current = window.setInterval(() => {
-          if (holdAction.current) holdAction.current();
-        }, speed);
-      }
-    }, speed);
-  };
-
-  const stopHold = () => {
-    if (holdInterval.current) {
-      clearInterval(holdInterval.current);
-      holdInterval.current = null;
-      holdAction.current = null;
-    }
   };
 
   useEffect(() => {
@@ -107,11 +151,7 @@ const CollectionCardGridItem = ({ card }: CollectionCardGridItemProps) => {
   }, [card.count]);
 
   useEffect(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = window.setTimeout(async () => {
+    const updateCard = async () => {
       if (localCount !== card.count) {
         try {
           await sdk.cardsManager.addCardToCollection(
@@ -137,208 +177,99 @@ const CollectionCardGridItem = ({ card }: CollectionCardGridItemProps) => {
           setLocalCount(card.count);
         }
       }
-    }, 500);
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
     };
+    updateCard();
   }, [localCount, card.count, card.cardNumber, card.id, card.name, dispatch]);
 
-  useEffect(() => {
-    return () => {
-      if (holdInterval.current) {
-        clearInterval(holdInterval.current);
-      }
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, []);
-
-  console.log(card);
+  const buttons = [
+    {
+      props: {
+        sx: STYLES.buttonStyle,
+        href: card.marketURL,
+        component: 'a',
+        target: '_blank',
+      },
+      icon: <ShoppingCartIcon />,
+    },
+    {
+      props: {
+        sx: STYLES.buttonStyle,
+        component: 'a',
+        href: `/cards/${card.cardNumber}`,
+        onClick: handleNavigate,
+      },
+      icon: <LaunchIcon />,
+    },
+    {
+      props: {
+        sx: STYLES.buttonStyle,
+        onClick: () => onZoomIn(card),
+        'aria-label': 'Zoom in',
+      },
+      icon: <ZoomInIcon />,
+    },
+  ];
 
   return (
-    <>
-      <MuiCard
-        sx={{
-          width: { xs: 140, sm: 160, md: 200 },
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          transition: 'transform 0.2s, box-shadow 0.2s',
-          '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: 6,
-          },
-        }}
-      >
+    <Paper elevation={6} sx={STYLES.paper0}>
+      <Box sx={STYLES.imageWrapper}>
         <Box
-          sx={{
-            position: 'relative',
-            paddingTop: '146%',
-            backgroundColor: 'action.hover',
-          }}
+          component="img"
+          src={card.imageUrl || ''}
+          alt={card.name}
+          sx={STYLES.cardImage}
+        />
+      </Box>
+      <CardContent sx={STYLES.cardContentWrapper}>
+        <Typography
+          {...body2TypographyProps}
+          sx={STYLES.cardTitle}
+          title={card.name}
         >
-          <Box
-            component="img"
-            src={card.imageUrl || ''}
-            alt={card.name}
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-        </Box>
-        <CardContent sx={{ padding: 1, '&:last-child': { paddingBottom: 1 } }}>
+          {card.name}
+        </Typography>
+        <Box sx={STYLES.cardNumberAndQuantityWrapper}>
           <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 'bold',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-            title={card.name}
+            variant="caption"
+            sx={STYLES.cardNumber}
+            title={card.cardNumber}
           >
-            {card.name}
+            {card.cardNumber}
           </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: 0.5,
-            }}
-          >
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                flex: 1,
-              }}
-              title={card.cardNumber}
-            >
-              {card.cardNumber}
+          {!isMobile && (
+            <Typography {...body1TypographyProps} sx={STYLES.cardQuantity}>
+              {visibleCount}x
             </Typography>
-            <Typography
-              variant="body1"
-              color="primary"
-              sx={{
-                fontWeight: 'bold',
-                fontSize: '1.1rem',
-                marginLeft: 1,
-              }}
+          )}
+        </Box>
+        <Box sx={STYLES.actionsWrapper}>
+          <Wrapper>
+            <CoreNumber
+              min={0}
+              max={100}
+              value={localCount}
+              setValue={(value: number | '') => setLocalCount(Number(value))}
+              variant="incrementAndDecrementOnly"
+              externalOnChange={(value) => setVisibleCount(Number(value))}
+              iconPaperProps={iconPaperProps}
             >
-              {localCount}x
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 1.5,
-              marginTop: 0.5,
-            }}
-          >
-            <Button
-              disabled={localCount === 0}
-              sx={buttonStyle}
-              onMouseDown={() => startHold(handleDecrement)}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-              onMouseUp={stopHold}
-              onMouseLeave={stopHold}
-              onTouchStart={() => startHold(handleDecrement)}
-              onTouchEnd={stopHold}
-            >
-              <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                <RemoveIcon fontSize="small" />
-              </Paper>
-            </Button>
-            <Button
-              sx={buttonStyle}
-              onMouseDown={() => startHold(handleIncrement)}
-              onMouseUp={stopHold}
-              onMouseLeave={stopHold}
-              onTouchStart={() => startHold(handleIncrement)}
-              onTouchEnd={stopHold}
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-            >
-              <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                <AddIcon fontSize="small" />
-              </Paper>
-            </Button>
-            <Button
-              sx={buttonStyle}
-              href={card.marketURL}
-              component="a"
-              target="_blank"
-            >
-              <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                <ShoppingCartIcon fontSize="small" />
-              </Paper>
-            </Button>
-            <Button
-              sx={buttonStyle}
-              component="a"
-              href={`/cards/${card.cardNumber}`}
-              onClick={handleNavigate}
-            >
-              <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                <LaunchIcon fontSize="small" />
-              </Paper>
-            </Button>
-            <Button
-              sx={buttonStyle}
-              onClick={handleZoomOpen}
-              aria-label="Zoom in"
-            >
-              <Paper elevation={4} sx={{ padding: 0.5, borderRadius: 1.5 }}>
-                <ZoomInIcon fontSize="small" />
-              </Paper>
-            </Button>
-          </Box>
-        </CardContent>
-      </MuiCard>
-      <Dialog open={zoomOpen} onClose={handleZoomClose} maxWidth="sm" fullWidth>
-        <DialogContent
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: '#222',
-          }}
-        >
-          <Box
-            component="img"
-            src={card.imageUrl || ''}
-            alt={card.name}
-            sx={{
-              maxWidth: '100%',
-              maxHeight: '70vh',
-              borderRadius: 2,
-              boxShadow: 6,
-              background: '#222',
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+              {isMobile && (
+                <Typography {...body1TypographyProps} sx={STYLES.cardQuantity}>
+                  {visibleCount}x
+                </Typography>
+              )}
+            </CoreNumber>
+          </Wrapper>
+          <Wrapper>
+            {buttons.map(({ props, icon }, index) => (
+              <Button key={index} {...props}>
+                <Paper {...iconPaperProps}>{icon}</Paper>
+              </Button>
+            ))}
+          </Wrapper>
+        </Box>
+      </CardContent>
+    </Paper>
   );
 };
 

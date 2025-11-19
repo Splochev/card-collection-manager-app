@@ -47,14 +47,21 @@ interface CoreNumberProps {
   min: number;
   max: number;
   value: number | '';
-  label: string;
-  btnLabel?: string;
   setValue: (value: number | '') => void;
-  onSubmit: () => void;
-  variant?: 'default' | 'withControls' | 'externalWithControls';
+  label?: string;
+  btnLabel?: string;
+  onSubmit?: () => void;
+  variant?:
+    | 'default'
+    | 'withControls'
+    | 'externalWithControls'
+    | 'incrementAndDecrementOnly';
   onCancel?: () => void;
   isLoading?: boolean;
   inputWidth?: number;
+  externalOnChange?: (value: number | '') => void;
+  iconPaperProps?: object;
+  children?: React.ReactNode;
 }
 
 const CoreNumber = ({
@@ -69,6 +76,9 @@ const CoreNumber = ({
   onCancel,
   isLoading = false,
   inputWidth = 80,
+  externalOnChange,
+  iconPaperProps,
+  children,
 }: CoreNumberProps) => {
   const [quantity, setQuantity] = useState<number | ''>(value);
   const [lastValid, setLastValid] = useState<number | ''>(value);
@@ -176,7 +186,7 @@ const CoreNumber = ({
 
     debounceTimerRef.current = window.setTimeout(() => {
       setValue(quantity);
-      lastSentValueRef.current = quantity; // mark as internally originated
+      lastSentValueRef.current = quantity;
     }, 200);
 
     return () => {
@@ -185,6 +195,12 @@ const CoreNumber = ({
       }
     };
   }, [quantity, setValue]);
+
+  useEffect(() => {
+    if (externalOnChange && lastSentValueRef.current !== quantity) {
+      externalOnChange(quantity);
+    }
+  }, [quantity, externalOnChange]);
 
   function onClickPaperFocusInput() {
     const input = inputRefContainer.current?.getElementsByTagName('input')[0];
@@ -226,6 +242,29 @@ const CoreNumber = ({
     sx: STYLES.controlButton,
   });
 
+  const internalIconPaperProps = {
+    elevation: 10,
+    sx: STYLES.iconPaperWrapper,
+  };
+
+  if (variant === 'incrementAndDecrementOnly') {
+    return (
+      <>
+        <Button {...buttonProps('l')}>
+          <Paper {...(iconPaperProps || internalIconPaperProps)}>
+            <RemoveIcon />
+          </Paper>
+        </Button>
+        {children}
+        <Button {...buttonProps('r')}>
+          <Paper {...(iconPaperProps || internalIconPaperProps)}>
+            <AddIcon />
+          </Paper>
+        </Button>
+      </>
+    );
+  }
+
   const CoreNumberContent = () => {
     return (
       <Grid sx={STYLES.gridWrapper}>
@@ -234,7 +273,7 @@ const CoreNumber = ({
         </Typography>
         <Grid sx={STYLES.grid}>
           <Button {...buttonProps('l')}>
-            <Paper elevation={10} sx={STYLES.iconPaperWrapper}>
+            <Paper {...(iconPaperProps || internalIconPaperProps)}>
               <RemoveIcon />
             </Paper>
           </Button>
@@ -252,7 +291,7 @@ const CoreNumber = ({
             />
           </Grid>
           <Button {...buttonProps('r')}>
-            <Paper elevation={10} sx={STYLES.iconPaperWrapper}>
+            <Paper {...(iconPaperProps || internalIconPaperProps)}>
               <AddIcon />
             </Paper>
           </Button>
