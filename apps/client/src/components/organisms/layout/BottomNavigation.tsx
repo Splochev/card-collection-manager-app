@@ -1,10 +1,41 @@
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Paper from '@mui/material/Paper';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { getTabProps } from '../../../utils';
 import * as React from 'react';
 import { PAGES } from '../../layouts/PageLayout';
+
+const STYLES = {
+  bottomNavWrapper: {
+    borderRadius: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingX: 1,
+  },
+  tabs: {
+    width: '100%',
+    '& .MuiTabs-list': {
+      justifyContent: 'space-around',
+    },
+    '& .MuiTab-root': {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 4.5,
+      fontSize: '0.875rem',
+      minWidth: '90px',
+      '@media (max-width:415px)': {
+        fontSize: '0.7rem',
+        minWidth: '60px',
+      },
+    },
+  },
+  tab: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4.5,
+  },
+};
 
 const BottomNavigation = ({
   value,
@@ -13,48 +44,20 @@ const BottomNavigation = ({
   value: number;
   handleChange: (event: React.SyntheticEvent, newValue: number) => void;
 }) => {
-  const isNarrow = useMediaQuery('(max-width:415px)');
-
   return (
-    <Paper
-      sx={{
-        borderRadius: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingX: 1,
-      }}
-      elevation={3}
-    >
+    <Paper sx={STYLES.bottomNavWrapper} elevation={3}>
       <Tabs
         value={value}
         onChange={handleChange}
         aria-label="navigation"
-        sx={{
-          width: '100%',
-          '& .MuiTabs-list': {
-            justifyContent: 'space-around',
-          },
-          '& .MuiTab-root': {
-            fontSize: isNarrow ? '0.7rem' : '0.875rem',
-            minWidth: isNarrow ? '60px' : '90px',
-          },
-        }}
+        sx={STYLES.tabs}
       >
         {PAGES.map((page, index) => (
           <Tab
             key={`mobile-${index}-${page.label}`}
             label={
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: isNarrow ? 3 : 6,
-                }}
-              >
-                {page.icon && (
-                  <page.icon size={isNarrow ? 'small' : 'medium'} />
-                )}
+              <div style={STYLES.tab}>
+                {page.icon && <page.icon size="medium" />}
                 {page.label}
               </div>
             }

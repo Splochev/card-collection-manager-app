@@ -20,6 +20,15 @@ import { toast } from 'react-toastify';
 import AppLoadingScreen from '../organisms/shared/AppLoadingScreen';
 import SearchCardSetFinished from '../toasts/SearchCardSetFinished';
 
+type PageConfig = {
+  label: string;
+  path: string;
+  param?: string;
+  component: React.LazyExoticComponent<React.ComponentType<any>>;
+  searchLabel: string;
+  icon: React.ComponentType<any>;
+};
+
 export const PAGES: readonly PageConfig[] = [
   {
     label: 'cards',
@@ -67,28 +76,20 @@ const STYLES = {
   },
 };
 
-type PageConfig = {
-  label: string;
-  path: string;
-  param?: string;
-  component: React.LazyExoticComponent<React.ComponentType<any>>;
-  searchLabel: string;
-  icon: React.ComponentType<any>;
-};
-
 export default function PageLayout() {
   const isSmDown = useMediaQuery(BREAKPOINTS.SMALL_DOWN);
   const navigate = useNavigate();
   const location = useLocation();
   const socketIdRef = useRef<string>('');
 
-  const [value, setValue] = useState(
-    PAGES.findIndex((page) => location.pathname.includes(page.path)),
-  );
+  const [value, setValue] = useState(() => {
+    const idx = PAGES.findIndex((page) => location.pathname.includes(page.path));
+    return idx === -1 ? 0 : idx;
+  });
 
   useEffect(() => {
     const pIndex = PAGES.findIndex((p) => location.pathname.includes(p.path));
-    if (pIndex >= 0 && pIndex !== value) setValue(pIndex);
+    if (pIndex !== value) setValue(pIndex === -1 ? 0 : pIndex);
   }, [location.pathname, value]);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {

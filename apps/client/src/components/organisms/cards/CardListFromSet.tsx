@@ -23,6 +23,7 @@ import {
   ELEMENT_IDS,
   body1TypographyProps,
   body2TypographyProps,
+  h6h6TypographyProps,
 } from '../../../constants';
 import WishlistManager from './WishlistManager';
 import SDK from '../../../sdk/SDK';
@@ -178,7 +179,7 @@ const CardListFromSet = () => {
 
   return (
     <Grid sx={STYLES.grid7}>
-      <Typography variant="h6">Other Cards from set</Typography>
+      <Typography {...h6h6TypographyProps}>Other Cards from set</Typography>
       <TextField
         label="Find cards"
         value={inputValue}

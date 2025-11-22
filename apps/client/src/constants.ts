@@ -44,6 +44,11 @@ const h6TypographyProps = {
   component: 'p' as const,
 };
 
+const h6h6TypographyProps = {
+  variant: 'h6' as const,
+  component: 'h6' as const,
+};
+
 type IconProps = {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   color?: 'inherit' | 'primary' | 'secondary';
@@ -64,5 +69,6 @@ export {
   body1TypographyProps,
   body2TypographyProps,
   h6TypographyProps,
+  h6h6TypographyProps
 };
 export type { IconProps };

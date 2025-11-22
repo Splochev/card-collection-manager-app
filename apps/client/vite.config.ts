@@ -12,7 +12,7 @@ export default defineConfig(() => ({
     host: 'localhost',
   },
   preview: {
-    port: 5174,
+    port: 5173,
     host: 'localhost',
   },
   plugins: [react(), svgr()],

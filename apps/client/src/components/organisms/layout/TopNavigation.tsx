@@ -10,9 +10,41 @@ import debounce from 'lodash/debounce';
 import { getTabProps } from '../../../utils';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Box } from '@mui/material';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import UserMenu from './UserMenu';
 import { PAGES } from '../../layouts/PageLayout';
+
+const STYLES = {
+  topNavigation: {
+    borderRadius: 0,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingX: 1,
+    height: 60,
+  },
+  tabLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+  },
+  mobileTopNavigation: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    alignItems: 'center',
+    flexWrap: 'nowrap',
+    paddingRight: 3,
+    gap: 1.5,
+    '@media (max-width:500px)': {
+      paddingX: 1,
+      gap: 0.5,
+    },
+  },
+  mobileLogo: {
+    minWidth: 35,
+  },
+};
 
 const TopNavigation = ({
   value,
@@ -27,7 +59,6 @@ const TopNavigation = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchValue, setSearchValue] = React.useState('');
-  const isVeryNarrow = useMediaQuery('(max-width:500px)');
 
   // Sync search input with URL
   React.useEffect(() => {
@@ -86,17 +117,7 @@ const TopNavigation = ({
     'Search';
 
   return (
-    <Paper
-      sx={{
-        borderRadius: 0,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingX: 1,
-        height: 60,
-      }}
-      elevation={3}
-    >
+    <Paper sx={STYLES.topNavigation} elevation={3}>
       {!isSmDown ? (
         <>
           <Grid container spacing={2} alignItems="center">
@@ -106,13 +127,7 @@ const TopNavigation = ({
                 <Tab
                   key={`desktop-${index}-${page.label}`}
                   label={
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
+                    <div style={STYLES.tabLabel}>
                       {page.icon && <page.icon size="small" />}
                       {page.label}
                     </div>
@@ -139,20 +154,8 @@ const TopNavigation = ({
           <UserMenu />
         </>
       ) : (
-        <Grid
-          container
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            width: '100%',
-            alignItems: 'center',
-            flexWrap: 'nowrap',
-            paddingX: isVeryNarrow ? 1 : 3,
-            gap: isVeryNarrow ? 0.5 : 1.5,
-          }}
-        >
-          <Box sx={{ minWidth: isVeryNarrow ? 28 : 35 }}>
+        <Grid container sx={STYLES.mobileTopNavigation}>
+          <Box sx={STYLES.mobileLogo}>
             <Logo />
           </Box>
           <CoreInput

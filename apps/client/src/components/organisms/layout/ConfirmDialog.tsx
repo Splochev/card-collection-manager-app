@@ -19,17 +19,28 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import {
+  body1TypographyProps,
+  h6h6TypographyProps,
+} from './../../../constants';
+
+const STYLES = {
+  icon: {
+    marginRight: 1,
+  },
+  titleBox: { display: 'flex', alignItems: 'center' },
+};
 
 const iconFor = (variant: ConfirmVariant) => {
   switch (variant) {
     case 'success':
-      return <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />;
+      return <CheckCircleOutlineIcon color="success" sx={STYLES.icon} />;
     case 'error':
-      return <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />;
+      return <ErrorOutlineIcon color="error" sx={STYLES.icon} />;
     case 'info':
-      return <InfoOutlinedIcon color="info" sx={{ mr: 1 }} />;
+      return <InfoOutlinedIcon color="info" sx={STYLES.icon} />;
     default:
-      return <WarningAmberIcon color="warning" sx={{ mr: 1 }} />;
+      return <WarningAmberIcon color="warning" sx={STYLES.icon} />;
   }
 };
 
@@ -46,6 +57,13 @@ const ConfirmDialog: React.FC = () => {
 
   if (!state) return null;
 
+  const buttonColor =
+    state.variant === 'error'
+      ? 'error'
+      : state.variant === 'success'
+        ? 'success'
+        : 'primary';
+
   return (
     <Dialog
       open={state.open}
@@ -53,16 +71,16 @@ const ConfirmDialog: React.FC = () => {
       aria-labelledby="confirm-dialog-title"
     >
       <DialogTitle id="confirm-dialog-title">
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={STYLES.titleBox}>
           {iconFor(state.variant)}
-          <Typography variant="h6">{state.title}</Typography>
+          <Typography {...h6h6TypographyProps}>{state.title}</Typography>
         </Box>
       </DialogTitle>
       <DialogContent>
         {getCustom(state.customKey) ? (
           <>{getCustom(state.customKey)}</>
         ) : (
-          <Typography>{state.message}</Typography>
+          <Typography {...body1TypographyProps}>{state.message}</Typography>
         )}
       </DialogContent>
       <DialogActions>
@@ -73,32 +91,20 @@ const ConfirmDialog: React.FC = () => {
         )}
         {state.confirmTextIsHref && state.confirmHref ? (
           <Button
-            component="a"
             href={state.confirmHref}
+            color={buttonColor}
+            onClick={() => handleClose(true)}
+            variant="contained"
+            component="a"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => handleClose(true)}
-            color={
-              state.variant === 'error'
-                ? 'error'
-                : state.variant === 'success'
-                ? 'success'
-                : 'primary'
-            }
-            variant="contained"
           >
             {state.confirmText}
           </Button>
         ) : (
           <Button
+            color={buttonColor}
             onClick={() => handleClose(true)}
-            color={
-              state.variant === 'error'
-                ? 'error'
-                : state.variant === 'success'
-                ? 'success'
-                : 'primary'
-            }
             variant="contained"
           >
             {state.confirmText}

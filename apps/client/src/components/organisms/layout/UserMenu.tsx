@@ -3,17 +3,52 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ThemeSwitch from '../../atoms/ThemeSwitch';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, setAccessToken } from '../../../stores/userSlice';
 import type { RootState } from '../../../stores/store';
 import { useLogto } from '@logto/react';
 import { LOGTO_POST_LOGOUT_REDIRECT_URI } from '../../../constants';
+
+const STYLES = {
+  menu: {
+    paper: {
+      elevation: 3,
+      sx: {
+        overflow: 'visible',
+        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+        mt: 1.5,
+        minWidth: 200,
+        '&:before': {
+          content: '""',
+          display: 'block',
+          position: 'absolute',
+          top: 0,
+          right: 14,
+          width: 10,
+          height: 10,
+          bgcolor: 'transparent',
+          transform: 'translateY(-50%) rotate(45deg)',
+          zIndex: 0,
+        },
+      },
+    },
+  },
+  menuItem: { height: 48 },
+  themeMenuItemBox: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    gap: 2,
+    justifyContent: 'start',
+  },
+  reverseRow: {
+    flexDirection: 'row-reverse',
+  },
+};
 
 const UserMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -31,8 +66,6 @@ const UserMenu = () => {
   };
 
   const handleEditUser = () => {
-    // TODO: Implement edit user functionality
-    console.log('Edit user clicked');
     handleClose();
   };
 
@@ -43,6 +76,25 @@ const UserMenu = () => {
 
     await signOut(LOGTO_POST_LOGOUT_REDIRECT_URI);
   };
+
+  const menuItems = [
+    {
+      icon: EditIcon,
+      label: 'Edit User',
+      onClick: handleEditUser,
+    },
+    {
+      onClick: (e: React.MouseEvent<HTMLElement>) => e.stopPropagation(),
+      isBox: true,
+      label: 'Theme',
+      icon: ThemeSwitch,
+    },
+    {
+      icon: LogoutIcon,
+      label: 'Logout',
+      onClick: handleLogout,
+    },
+  ];
 
   return (
     <>
@@ -64,55 +116,21 @@ const UserMenu = () => {
         onClick={handleClose}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        slotProps={{
-          paper: {
-            elevation: 3,
-            sx: {
-              overflow: 'visible',
-              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-              mt: 1.5,
-              minWidth: 200,
-              '&:before': {
-                content: '""',
-                display: 'block',
-                position: 'absolute',
-                top: 0,
-                right: 14,
-                width: 10,
-                height: 10,
-                bgcolor: 'transparent',
-                transform: 'translateY(-50%) rotate(45deg)',
-                zIndex: 0,
-              },
-            },
-          },
-        }}
+        slotProps={STYLES.menu}
       >
-        <MenuItem onClick={handleEditUser} sx={{ height: 48 }}>
-          <ListItemIcon>
-            <EditIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Edit User</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={(e) => e.stopPropagation()} sx={{ height: 48 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
-            }}
-          >
-            <ListItemText>Theme</ListItemText>
-            <ThemeSwitch />
-          </Box>
-        </MenuItem>
-        <MenuItem onClick={handleLogout} sx={{ height: 48 }}>
-          <ListItemIcon>
-            <LogoutIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Logout</ListItemText>
-        </MenuItem>
+        {menuItems.map((item, index) => (
+          <MenuItem key={index} onClick={item.onClick} sx={STYLES.menuItem}>
+            <Box
+              sx={{
+                ...STYLES.themeMenuItemBox,
+                ...(item.isBox ? STYLES.reverseRow : {}),
+              }}
+            >
+              <item.icon />
+              <Typography>{item.label}</Typography>
+            </Box>
+          </MenuItem>
+        ))}
       </Menu>
     </>
   );

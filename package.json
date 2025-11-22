@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "build:client": "nx build client",
+    "build:client:start": "nx preview client",
+    "start:client": "nx build client && nx preview client",
     "client": "npx nx serve client",
     "server": "npx nx run @card-collection-manager-app/server:serve:dev",
     "scraper": "npx nx serve scrape-service"
