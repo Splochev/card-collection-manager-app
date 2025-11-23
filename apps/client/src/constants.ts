@@ -39,6 +39,16 @@ const body2TypographyProps = {
   component: 'p' as const,
 };
 
+const body2SpanTypographyProps = {
+  variant: 'body2' as const,
+  component: 'span' as const,
+};
+
+const h5TypographyProps = {
+  variant: 'h5' as const,
+  component: 'h5' as const,
+};
+
 const h6TypographyProps = {
   variant: 'h6' as const,
   component: 'p' as const,
@@ -50,7 +60,7 @@ const h6h6TypographyProps = {
 };
 
 type IconProps = {
-  size?: 'small' | 'medium' | 'large' | 'xlarge';
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | number;
   color?: 'inherit' | 'primary' | 'secondary';
   disableClick?: boolean;
 };
@@ -69,6 +79,8 @@ export {
   body1TypographyProps,
   body2TypographyProps,
   h6TypographyProps,
-  h6h6TypographyProps
+  h6h6TypographyProps,
+  h5TypographyProps,
+  body2SpanTypographyProps,
 };
 export type { IconProps };

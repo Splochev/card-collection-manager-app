@@ -18,8 +18,6 @@ const STYLES = {
 };
 
 const CardStats = ({ card }: { card: ICard | null }) => {
-  console.log(card?.typeline);
-
   const typeline =
     card?.typeline && typeof card?.typeline === 'string'
       ? card.typeline.replace(/["{}]/g, ' ').replace(',', ' / ')

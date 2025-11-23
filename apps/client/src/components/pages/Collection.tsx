@@ -1,12 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Dialog,
-  DialogContent,
-} from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 import type { RootState } from '../../stores/store';
 import {
   setGroups,
@@ -18,23 +12,80 @@ import {
   resetCollection,
 } from '../../stores/collectionSlice';
 import SDK from '../../sdk/SDK';
-import { BACKEND_URL } from '../../constants';
+import {
+  BACKEND_URL,
+  body2SpanTypographyProps,
+  h5TypographyProps,
+} from '../../constants';
 import CollectionToolbar from '../organisms/collection/CollectionToolbar';
 import CollectionCardGridItem from '../organisms/collection/CollectionCardGridItem';
 import CollectionCardListItem from '../organisms/collection/CollectionCardListItem';
-import EmptyState from '../organisms/shared/EmptyState';
-import Grid from '@mui/material/Grid';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { ICard } from '../../interfaces/card.interface';
-import CardInfoHeader from '../organisms/cards/CardInfoHeader';
-import CardFullInfo from '../organisms/cards/CardFullInfo';
-import CardWrapper from '../atoms/CardWrapper';
+import NoCardFound from '../organisms/collection/NoCardFound';
+import ZoomInCard from '../Dialogs/ZoomInCard';
+
+const STYLES = {
+  container: {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+  },
+  contentContainer: {
+    padding: { xs: 1.5, sm: 2 },
+    paddingBottom: 4,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
+    overflowY: 'auto',
+    flex: 1,
+  },
+  groupsContainer: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+  },
+  infiniteScrollTrigger: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: 3,
+    minHeight: 50,
+  },
+  groupKey: {
+    marginBottom: 2,
+    fontWeight: 'bold',
+    fontSize: { xs: '1.25rem', sm: '1.5rem' },
+  },
+  grid: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 4,
+    justifyContent: 'start',
+    '@media (max-width: 715px)': {
+      gap: 1.5,
+    },
+    '@media (max-width: 670px)': {
+      justifyContent: 'center',
+      gap: 4,
+    },
+    '@media (max-width: 475px)': {
+      gap: 1.5,
+    },
+  },
+  groupCardsCount: {
+    color: 'text.secondary',
+    marginLeft: 1,
+  },
+};
 
 const sdk = SDK.getInstance(BACKEND_URL);
 
 const Collection = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [zoomInCard, setZoomInCard] = useState<ICard | null>(null);
   const [searchParams] = useSearchParams();
   const urlFilter = searchParams.get('filter') || '';
@@ -119,111 +170,29 @@ const Collection = () => {
   }, [hasMore, isLoading, dispatch, fetchCollection]);
 
   if (!isLoading && groups.length === 0) {
-    return (
-      <Grid
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          width: '100%',
-          alignItems: 'center',
-          padding: 2,
-        }}
-      >
-        {hasActiveFilter ? (
-          <EmptyState
-            title="No cards found"
-            description="No cards in your collection match the current search criteria. Try adjusting your search or clear the filter."
-            callback={() => {
-              setTimeout(() => {
-                const searchLabel =
-                  'Find cards in collection by card name, set number or set name';
-                const searchInput = document.getElementById(searchLabel);
-                if (searchInput) {
-                  searchInput.focus();
-                }
-              }, 100);
-            }}
-          />
-        ) : (
-          <EmptyState
-            title="Your collection is empty"
-            description="Start adding cards to your collection from the Cards page!"
-            callback={() => {
-              navigate('/cards');
-            }}
-          />
-        )}
-      </Grid>
-    );
+    return <NoCardFound hasActiveFilter={hasActiveFilter} />;
   }
 
   return (
     <>
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-        }}
-      >
+      <Box sx={STYLES.container}>
         <CollectionToolbar onRefresh={handleRefresh} />
-        <Box
-          sx={{
-            padding: { xs: 1.5, sm: 2 },
-            paddingBottom: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            overflowY: 'auto',
-            flex: 1,
-          }}
-        >
-          <Box sx={{ width: '100%' }}>
+        <Box sx={STYLES.contentContainer}>
+          <Box sx={STYLES.groupsContainer}>
             {groups.map((group) => (
-              <Box key={group.groupKey} sx={{ marginBottom: 4 }}>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    marginBottom: 2,
-                    fontWeight: 'bold',
-                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                  }}
-                >
-                  {group.groupKey}{' '}
+              <Box key={group.groupKey}>
+                <Typography {...h5TypographyProps} sx={STYLES.groupKey}>
+                  {group.groupKey}
                   <Typography
-                    component="span"
-                    variant="body2"
-                    color="text.secondary"
+                    {...body2SpanTypographyProps}
+                    sx={STYLES.groupCardsCount}
                   >
                     ({group.cards.length} card
                     {group.cards.length !== 1 ? 's' : ''})
                   </Typography>
                 </Typography>
-
-                {/* Cards Grid/List */}
                 {viewMode === 'grid' ? (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: 4,
-                      justifyContent: 'start',
-                      '@media (max-width: 715px)': {
-                        gap: 1.5,
-                      },
-                      '@media (max-width: 670px)': {
-                        justifyContent: 'center',
-                        gap: 4,
-                      },
-                      '@media (max-width: 475px)': {
-                        gap: 1.5,
-                      },
-                    }}
-                  >
+                  <Box sx={STYLES.grid}>
                     {group.cards.map((card, index) => (
                       <CollectionCardGridItem
                         key={`collection-card-grid-item-${card.id}-${card.cardNumber}-${index}`}
@@ -245,66 +214,13 @@ const Collection = () => {
                 )}
               </Box>
             ))}
-
-            {/* Infinite Scroll Trigger */}
-            <Box
-              ref={observerTarget}
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                padding: 3,
-                minHeight: 100,
-              }}
-            >
+            <Box ref={observerTarget} sx={STYLES.infiniteScrollTrigger}>
               {isLoading && <CircularProgress />}
             </Box>
-
-            {!hasMore && groups.length > 0 && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                textAlign="center"
-                sx={{ marginTop: 2 }}
-              >
-                You've reached the end of your collection
-              </Typography>
-            )}
           </Box>
         </Box>
       </Box>
-      <Dialog
-        open={Boolean(zoomInCard)}
-        onClose={() => setZoomInCard(null)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogContent
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#222',
-            overflow: 'visible',
-            gap: 4,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <CardWrapper
-              url={zoomInCard?.imageUrl || undefined}
-              name={zoomInCard?.name || undefined}
-              card={zoomInCard}
-            />
-          </Box>
-          <CardFullInfo card={zoomInCard} removeScroll showAll />
-        </DialogContent>
-      </Dialog>
+      <ZoomInCard zoomInCard={zoomInCard} setZoomInCard={setZoomInCard} />
     </>
   );
 };

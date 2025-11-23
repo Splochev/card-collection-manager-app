@@ -73,6 +73,10 @@ const STYLES = {
     gap: { xs: 0, sm: 2 },
     overflowY: 'auto',
     overflowX: 'hidden',
+    height: `calc(100vh - 60px)`,
+    '@media (max-width: 970px)': {
+      height: `calc(100vh - 120px)`,
+    },
   },
 };
 
@@ -83,7 +87,9 @@ export default function PageLayout() {
   const socketIdRef = useRef<string>('');
 
   const [value, setValue] = useState(() => {
-    const idx = PAGES.findIndex((page) => location.pathname.includes(page.path));
+    const idx = PAGES.findIndex((page) =>
+      location.pathname.includes(page.path),
+    );
     return idx === -1 ? 0 : idx;
   });
 
@@ -133,12 +139,7 @@ export default function PageLayout() {
         value={value}
         handleChange={handleChange}
       />
-      <Grid
-        sx={{
-          ...STYLES.grid,
-          height: `calc(100vh - ${isSmDown ? '120px' : '60px'})`,
-        }}
-      >
+      <Grid sx={STYLES.grid}>
         {!PAGES.some((page) => location.pathname.includes(page.path)) && (
           <Navigate to="/cards" replace />
         )}

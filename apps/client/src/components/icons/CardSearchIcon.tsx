@@ -6,9 +6,16 @@ import { ICON_SIZE_MAP, IconProps } from '../../constants';
 const CardSearchIcon = ({ size = 'small', color }: IconProps) => {
   return (
     <CardSearchSvg
-      className={ICON_SIZE_MAP[size]}
+      className={
+        typeof size === 'string' && ICON_SIZE_MAP[size]
+          ? ICON_SIZE_MAP[size]
+          : ''
+      }
       style={{
         fill: 'currentColor',
+        width: typeof size === 'number' ? size : undefined,
+        height: typeof size === 'number' ? size : undefined,
+        paddingTop: typeof size === 'number' ? '8px' : undefined,
         color: color
           ? color
           : store.getState().theme.mode === 'light'

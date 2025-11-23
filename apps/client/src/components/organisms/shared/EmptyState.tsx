@@ -5,6 +5,58 @@ import { useState, type JSX } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CollectionIcon from '../../icons/CollectionIcon';
+import { body2TypographyProps, h5TypographyProps } from './../../../constants';
+
+const STYLES = {
+  flexContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    justifyContent: 'space-around',
+    height: 'fit-content',
+    paddingY: 12,
+    borderRadius: 2,
+    cursor: 'pointer',
+    maxWidth: '800px',
+    width: '100%',
+  },
+  innerContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    width: '80%',
+    gap: 2,
+  },
+  iconsContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    width: '100%',
+  },
+  iconStyleObj: {
+    borderRadius: 2,
+    width: 50,
+    height: 50,
+    padding: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    textAlign: 'center',
+    background: (theme: any) => theme.palette.primary.main,
+    transition: 'transform 0.3s',
+  },
+  description: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    gap: 0.5,
+  },
+};
 
 const EmptyState = ({
   title,
@@ -19,115 +71,43 @@ const EmptyState = ({
 }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
 
-  const iconStyleObj = {
-    borderRadius: 2,
-    width: 50,
-    height: 50,
-    padding: 1,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    textAlign: 'center',
-  };
+  const getStyle = (p: 'left' | 'center' | 'right') => ({
+    ...STYLES.iconStyleObj,
+    rotate: p === 'center' ? '0deg' : `${p === 'left' ? '-' : '+'}30deg`,
+    ...(p !== 'center' ? { [`margin${p}`]: '-8px' } : { marginBottom: 3 }),
+    boxShadow:
+      p === 'center'
+        ? '0px 3px 5px rgba(0, 0, 0, 0.4)'
+        : isHovered
+          ? '0px 3px 5px rgba(0, 0, 0, 0.5)'
+          : '0px 3px 5px rgba(0, 0, 0, 0.2)',
+    transform: isHovered
+      ? p === 'center'
+        ? 'translateY(-8px)'
+        : `translateX(${p === 'left' ? '-' : '+'}15px) translateY(-15px)`
+      : 'translateX(0)',
+    zIndex: p === 'center' ? 1 : 0,
+  });
 
   return (
     <Paper
       component="button"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      elevation={isHovered ? 4 : 3}
+      elevation={isHovered ? 5 : 3}
       onClick={callback}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-        justifyContent: 'space-around',
-        height: 'fit-content',
-        paddingY: 12,
-        borderRadius: 2,
-        cursor: 'pointer',
-        maxWidth: '800px',
-        width: '100%',
-      }}
+      sx={STYLES.flexContainer}
     >
-      <Grid
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          width: '80%',
-          gap: 2,
-        }}
-      >
-        <Grid
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            width: '100%',
-          }}
-        >
-          <SearchIcon
-            sx={{
-              ...iconStyleObj,
-              background: (theme) => theme.palette.primary.main,
-              rotate: '-30deg',
-              marginRight: '-8px',
-              boxShadow: isHovered
-                ? '0px 3px 5px rgba(0, 0, 0, 0.5)'
-                : '0px 3px 5px rgba(0, 0, 0, 0.2)',
-              transition: 'transform 0.3s',
-              transform: isHovered
-                ? 'translateX(-15px) translateY(-15px)'
-                : 'translateX(0)',
-            }}
-            color="inherit"
-          />
-          <AutoAwesomeIcon
-            sx={{
-              ...iconStyleObj,
-              background: (theme) => theme.palette.primary.main,
-              marginBottom: 3,
-              zIndex: 1,
-              boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.4)',
-              transition: 'transform 0.3s',
-              transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
-            }}
-            color="inherit"
-          />
-          <Grid
-            sx={{
-              ...iconStyleObj,
-              background: (theme) => theme.palette.primary.main,
-              rotate: '30deg',
-              marginLeft: '-8px',
-              boxShadow: isHovered
-                ? '0px 3px 5px rgba(0, 0, 0, 0.5)'
-                : '0px 3px 5px rgba(0, 0, 0, 0.2)',
-              transition: 'transform 0.3s',
-              transform: isHovered
-                ? 'translateX(15px) translateY(-15px)'
-                : 'translateX(0)',
-            }}
-          >
+      <Grid sx={STYLES.innerContainer}>
+        <Grid sx={STYLES.iconsContainer}>
+          <SearchIcon sx={getStyle('left')} color="inherit" />
+          <AutoAwesomeIcon sx={getStyle('center')} color="inherit" />
+          <Grid sx={getStyle('right')}>
             <CollectionIcon color="inherit" size={50} />
           </Grid>
         </Grid>
-        <Typography variant="h5">{title}</Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            gap: 0.5,
-          }}
-        >
+        <Typography {...h5TypographyProps}>{title}</Typography>
+        <Typography {...body2TypographyProps} sx={STYLES.description}>
           {description.split(/\r?\n/).map((line, idx) => (
             <span key={`description-${idx}`}>
               {line}

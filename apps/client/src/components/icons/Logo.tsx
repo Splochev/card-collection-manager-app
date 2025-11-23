@@ -32,7 +32,9 @@ const Logo = ({ size = 'small', disableClick = false }: IconProps) => {
       <img
         src={logo}
         alt="Logo"
-        className={ICON_SIZE_MAP[size]}
+        className={ICON_SIZE_MAP[
+          typeof size === 'string' && size in ICON_SIZE_MAP ? size as keyof typeof ICON_SIZE_MAP : 'small'
+        ]}
         style={{
           transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
         }}

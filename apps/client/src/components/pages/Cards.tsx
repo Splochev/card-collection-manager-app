@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom';
 import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Grid from '@mui/material/Grid';
 import { toast } from 'react-toastify';
-import { Button } from '@mui/material';
 import type { ICard } from '../../interfaces/card.interface';
 import SDK from '../../sdk/SDK';
 import { BACKEND_URL, CARD_SET_CODE_REGEX, ELEMENT_IDS } from '../../constants';
@@ -18,28 +17,43 @@ import {
 } from '../../stores/cardSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../../stores/store';
-import CoreInput from '../molecules/CoreInput';
 import CardsLoadingScreen from '../organisms/cards/CardsLoadingScreen';
 import CardListLoadingSkeleton from '../organisms/cards/CardListLoadingSkeleton';
+import NoCardFound from '../organisms/cards/NoCardFound';
 
 const CardListFromSet = lazy(
   () => import('../organisms/cards/CardListFromSet'),
 );
 
-interface CardsProps {
-  socketId: string;
-}
+const STYLES = {
+  emptyStateContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    alignItems: 'center',
+    padding: 2,
+  },
+  pageContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    gap: { xs: 2, sm: 4 },
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    padding: { xs: 1, sm: 2 },
+  },
+};
 
-const Cards = ({ socketId }: CardsProps) => {
+const Cards = ({ socketId }: { socketId: string }) => {
   const sdk = SDK.getInstance(BACKEND_URL);
   const dispatch = useDispatch();
   const { cardNumber: urlCardNumber } = useParams<{ cardNumber?: string }>();
-
   const cardsList = useSelector((state: RootState) => state.cards.cardsList);
   const cardSetPrefixInStore = useSelector(
     (state: RootState) => state.cards.cardSetPrefix,
   );
-
   const [searchedCard, setSearchedCard] = useState<ICard | null>(null);
   const [quantity, setQuantity] = useState<number | ''>(1);
   const [cardSetName, setCardSetName] = useState<string>('');
@@ -56,7 +70,6 @@ const Cards = ({ socketId }: CardsProps) => {
     }
   }, [searchedCard, dispatch]);
 
-  // Sync searchedCard with Redux state when wishlist changes
   useEffect(() => {
     if (searchedCard && cardsList.length > 0) {
       const updatedCard = cardsList.find(
@@ -72,27 +85,6 @@ const Cards = ({ socketId }: CardsProps) => {
       }
     }
   }, [cardsList, searchedCard]);
-
-  const fetchCardSet = useCallback(
-    async (cardSetNameValue: string) => {
-      try {
-        await sdk.cardsManager.findCardSets(
-          {
-            cardSetNames: [cardSetNameValue],
-            cardSetCode: urlCardNumber || '',
-          },
-          socketId,
-        );
-        toast.success(
-          'Started search — you will be notified when it finishes.',
-        );
-      } catch (error) {
-        console.error('Error fetching card set:', error);
-        toast.error('Failed to start search. Please try again.');
-      }
-    },
-    [sdk.cardsManager, socketId, urlCardNumber],
-  );
 
   useEffect(() => {
     const executeSearch = async () => {
@@ -174,6 +166,27 @@ const Cards = ({ socketId }: CardsProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlCardNumber]);
 
+  const fetchCardSet = useCallback(
+    async (cardSetNameValue: string) => {
+      try {
+        await sdk.cardsManager.findCardSets(
+          {
+            cardSetNames: [cardSetNameValue],
+            cardSetCode: urlCardNumber || '',
+          },
+          socketId,
+        );
+        toast.success(
+          'Started search — you will be notified when it finishes.',
+        );
+      } catch (error) {
+        console.error('Error fetching card set:', error);
+        toast.error('Failed to start search. Please try again.');
+      }
+    },
+    [sdk.cardsManager, socketId, urlCardNumber],
+  );
+
   const onSubmit = async () => {
     if (!searchedCard) return;
     try {
@@ -250,118 +263,51 @@ const Cards = ({ socketId }: CardsProps) => {
     }
   };
 
-  if (isLoading) return <CardsLoadingScreen />;
-
-  if (showCardSetFetch) {
-    return (
-      <Grid
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          width: '100%',
-          alignItems: 'center',
-          padding: 2,
-        }}
-      >
-        <EmptyState
-          title="Find Card Set"
-          description={`We couldn't find the card set you're looking for. Would you like to\n\rprovide the card set name for the card with set code: ${urlCardNumber}?`}
-          callback={() => {
-            const searchBar = document.getElementById(
-              ELEMENT_IDS.CARD_SET_NAME_INPUT,
-            );
-            searchBar?.focus();
-          }}
-          custom={() => (
-            <Grid
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                gap: 2,
-                width: '100%',
-                maxWidth: '500px',
-              }}
-            >
-              <CoreInput
-                label={ELEMENT_IDS.CARD_SET_NAME_INPUT}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setCardSetName(e.target.value)
-                }
-                value={cardSetName}
-              />
-              <Button
-                variant="contained"
-                sx={{ width: '100%' }}
-                onClick={async () => {
-                  if (!cardSetName) return;
-                  await fetchCardSet(cardSetName);
-                }}
-              >
-                Search
-              </Button>
-            </Grid>
-          )}
+  switch (true) {
+    case isLoading:
+      return <CardsLoadingScreen />;
+    case showCardSetFetch:
+      return (
+        <NoCardFound
+          setCardSetName={setCardSetName}
+          cardSetName={cardSetName}
+          urlCardNumber={urlCardNumber}
+          fetchCardSet={fetchCardSet}
         />
-      </Grid>
-    );
+      );
+    case Boolean(!cardsList.length):
+      return (
+        <Grid sx={STYLES.emptyStateContainer}>
+          <EmptyState
+            title="Search for Yu-Gi-Oh! Cards"
+            description={`Use the search bar above to find cards and add them to your collection.\n\rExplore thousands of cards from different sets and rarities.`}
+            callback={() => {
+              const searchBar = document.getElementById(
+                ELEMENT_IDS.CARD_SEARCH_INPUT,
+              );
+              searchBar?.focus();
+            }}
+          />
+        </Grid>
+      );
+    default:
+      return (
+        <Grid sx={STYLES.pageContainer}>
+          <CardImageAndQuantity
+            card={searchedCard}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            onSubmit={onSubmit}
+            onAddToWishlist={handleAddToWishlist}
+            onRemoveFromWishlist={handleRemoveFromWishlist}
+          />
+          <CardFullInfo card={searchedCard} />
+          <Suspense fallback={<CardListLoadingSkeleton />}>
+            <CardListFromSet />
+          </Suspense>
+        </Grid>
+      );
   }
-
-  if (!cardsList.length) {
-    return (
-      <Grid
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          width: '100%',
-          alignItems: 'center',
-          padding: 2,
-        }}
-      >
-        <EmptyState
-          title="Search for Yu-Gi-Oh! Cards"
-          description={`Use the search bar above to find cards and add them to your collection.\n\rExplore thousands of cards from different sets and rarities.`}
-          callback={() => {
-            const searchBar = document.getElementById(
-              ELEMENT_IDS.CARD_SEARCH_INPUT,
-            );
-            searchBar?.focus();
-          }}
-        />
-      </Grid>
-    );
-  }
-
-  return (
-    <Grid
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: '100%',
-        gap: { xs: 2, sm: 4 },
-        flexWrap: 'wrap',
-        alignItems: 'flex-start',
-        padding: { xs: 1, sm: 2 },
-      }}
-    >
-      <CardImageAndQuantity
-        card={searchedCard}
-        quantity={quantity}
-        setQuantity={setQuantity}
-        onSubmit={onSubmit}
-        onAddToWishlist={handleAddToWishlist}
-        onRemoveFromWishlist={handleRemoveFromWishlist}
-      />
-      <CardFullInfo card={searchedCard} />
-      <Suspense fallback={<CardListLoadingSkeleton />}>
-        <CardListFromSet />
-      </Suspense>
-    </Grid>
-  );
 };
 
 export default Cards;
