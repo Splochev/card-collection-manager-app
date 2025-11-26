@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import type { ICard } from '@card-collection-manager-app/shared';
 import CardDescription from './CardDescription';
-import { body2TypographyProps, h6TypographyProps } from '../../../constants';
+import { t } from '../../../constants';
 
 const STYLES = {
   paper: {
@@ -27,11 +27,11 @@ const CardStats = ({ card }: { card: ICard | null }) => {
   const isMonster = card?.type?.includes('Monster');
   return (
     <Paper elevation={6} sx={STYLES.paper}>
-      <Typography {...h6TypographyProps}>Card stats</Typography>
+      <Typography {...t.p.h6}>Card stats</Typography>
       <Grid container spacing={2} justifyContent={'space-between'}>
-        <Typography {...body2TypographyProps}>{typeline}</Typography>
+        <Typography {...t.p.body2}>{typeline}</Typography>
         <Grid container spacing={2}>
-          <Typography {...body2TypographyProps}>
+          <Typography {...t.p.body2}>
             {card?.level ? (
               <span style={STYLES.span}>
                 <span>Level: {card.level}</span>
@@ -46,7 +46,7 @@ const CardStats = ({ card }: { card: ICard | null }) => {
       <CardDescription desc={card?.desc || ''} />
       {isMonster && (
         <Grid container spacing={2} justifyContent={'end'}>
-          <Typography {...body2TypographyProps}>
+          <Typography {...t.p.body2}>
             <span style={STYLES.span}>
               <span>ATK/ {card?.atk}</span>
               <span>DEF/ {card?.def}</span>

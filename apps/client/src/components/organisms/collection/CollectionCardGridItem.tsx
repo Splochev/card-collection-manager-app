@@ -15,8 +15,7 @@ import type { ICard } from '@card-collection-manager-app/shared';
 import SDK from '../../../sdk/SDK';
 import {
   BACKEND_URL,
-  body1TypographyProps,
-  body2TypographyProps,
+  t,
 } from '../../../constants';
 import { toast } from 'react-toastify';
 import { useState, useEffect, Fragment } from 'react';
@@ -222,7 +221,7 @@ const CollectionCardGridItem = ({
       </Box>
       <CardContent sx={STYLES.cardContentWrapper}>
         <Typography
-          {...body2TypographyProps}
+          {...t.p.body2}
           sx={STYLES.cardTitle}
           title={card.name}
         >
@@ -237,7 +236,7 @@ const CollectionCardGridItem = ({
             {card.cardNumber}
           </Typography>
           {!isMobile && (
-            <Typography {...body1TypographyProps} sx={STYLES.cardQuantity}>
+            <Typography  {...t.p.body1}  sx={STYLES.cardQuantity}>
               {visibleCount}x
             </Typography>
           )}
@@ -254,7 +253,7 @@ const CollectionCardGridItem = ({
               iconPaperProps={iconPaperProps}
             >
               {isMobile && (
-                <Typography {...body1TypographyProps} sx={STYLES.cardQuantity}>
+                <Typography  {...t.p.body1}  sx={STYLES.cardQuantity}>
                   {visibleCount}x
                 </Typography>
               )}

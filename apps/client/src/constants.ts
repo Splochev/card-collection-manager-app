@@ -29,40 +29,35 @@ const ICON_SIZE_MAP = {
   xlarge: 'h-24',
 };
 
-const body1TypographyProps = {
-  variant: 'body1' as const,
-  component: 'p' as const,
-};
-
-const body2TypographyProps = {
-  variant: 'body2' as const,
-  component: 'p' as const,
-};
-
-const body2SpanTypographyProps = {
-  variant: 'body2' as const,
-  component: 'span' as const,
-};
-
-const h5TypographyProps = {
-  variant: 'h5' as const,
-  component: 'h5' as const,
-};
-
-const h6TypographyProps = {
-  variant: 'h6' as const,
-  component: 'p' as const,
-};
-
-const h6h6TypographyProps = {
-  variant: 'h6' as const,
-  component: 'h6' as const,
-};
-
-type IconProps = {
-  size?: 'small' | 'medium' | 'large' | 'xlarge' | number;
-  color?: 'inherit' | 'primary' | 'secondary';
-  disableClick?: boolean;
+const t = {
+  p: {
+    body1: {
+      variant: 'body1' as const,
+      component: 'p' as const,
+    },
+    body2: {
+      variant: 'body2' as const,
+      component: 'p' as const,
+    },
+    h6: {
+      variant: 'h6' as const,
+      component: 'p' as const,
+    },
+  },
+  span: {
+    body2: {
+      variant: 'body2' as const,
+      component: 'span' as const,
+    },
+  },
+  h5: {
+    variant: 'h5' as const,
+    component: 'h5' as const,
+  },
+  h6:{
+    variant: 'h6' as const,
+    component: 'h6' as const,
+  }
 };
 
 export {
@@ -76,11 +71,5 @@ export {
   BREAKPOINTS,
   ELEMENT_IDS,
   ICON_SIZE_MAP,
-  body1TypographyProps,
-  body2TypographyProps,
-  h6TypographyProps,
-  h6h6TypographyProps,
-  h5TypographyProps,
-  body2SpanTypographyProps,
+  t,
 };
-export type { IconProps };

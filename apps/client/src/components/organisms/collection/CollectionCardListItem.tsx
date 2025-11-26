@@ -6,11 +6,7 @@ import {
 } from '@mui/icons-material';
 import type { ICard } from '@card-collection-manager-app/shared';
 import SDK from '../../../sdk/SDK';
-import {
-  BACKEND_URL,
-  body1TypographyProps,
-  body2TypographyProps,
-} from '../../../constants';
+import { BACKEND_URL, t } from '../../../constants';
 import { toast } from 'react-toastify';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -236,11 +232,7 @@ const CollectionCardListItem = ({
       />
       <CardContent sx={STYLES.cardContent}>
         <Box sx={STYLES.row0}>
-          <Typography
-            {...body2TypographyProps}
-            sx={STYLES.cardTitle}
-            title={card.name}
-          >
+          <Typography {...t.p.body2} sx={STYLES.cardTitle} title={card.name}>
             {card.name}
           </Typography>
           <Box sx={STYLES.actionsWrapper}>
@@ -254,7 +246,7 @@ const CollectionCardListItem = ({
                 externalOnChange={(value) => setVisibleCount(Number(value))}
                 iconPaperProps={iconPaperProps}
               >
-                <Typography {...body1TypographyProps} sx={STYLES.cardQuantity}>
+                <Typography {...t.p.body1} sx={STYLES.cardQuantity}>
                   {visibleCount}x
                 </Typography>
               </CoreNumber>
@@ -268,12 +260,12 @@ const CollectionCardListItem = ({
             </Box>
           </Box>
         </Box>
-        <Typography {...body2TypographyProps} sx={STYLES.cardDetails}>
+        <Typography {...t.p.body2} sx={STYLES.cardDetails}>
           {card.cardNumber} - {card.cardSetName}
         </Typography>
         <Box sx={STYLES.rarityAndCardTypeWrapper}>
           {card.rarities && card.rarities.length > 0 && (
-            <Typography {...body2TypographyProps} sx={STYLES.rarity}>
+            <Typography {...t.p.body2} sx={STYLES.rarity}>
               {card.rarities.join(', ')}
             </Typography>
           )}

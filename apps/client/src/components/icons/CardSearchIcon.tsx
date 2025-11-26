@@ -1,7 +1,8 @@
 import CardSearchSvg from '../../assets/card-search.svg?react';
 import { store } from '../../stores/store';
 import { darkTheme, lightTheme } from '../../themes';
-import { ICON_SIZE_MAP, IconProps } from '../../constants';
+import { ICON_SIZE_MAP } from '../../constants';
+import type { IconProps } from '@card-collection-manager-app/shared';
 
 const CardSearchIcon = ({ size = 'small', color }: IconProps) => {
   return (

@@ -1,5 +1,5 @@
 import { Button, Grid, Typography } from '@mui/material';
-import { body2TypographyProps } from '../../constants';
+import { t } from '../../constants';
 
 const STYLES = {
   gridContainer: { display: 'flex', gap: 1, alignItems: 'start', marginTop: 1 },
@@ -15,7 +15,7 @@ const SearchCardSetFinished = ({
 }) => {
   return (
     <Grid sx={STYLES.gridContainer}>
-      <Typography {...body2TypographyProps}>
+      <Typography {...t.p.body2}>
         Finished search for "{collectionName}".
       </Typography>
       <Button variant="text" href={`/cards/${cardSetCode}`} sx={STYLES.button}>

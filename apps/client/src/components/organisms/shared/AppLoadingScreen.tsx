@@ -2,7 +2,7 @@ import { Box, Typography, keyframes } from '@mui/material';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../stores/store';
 import Logo from '../../icons/Logo';
-import { h5TypographyProps } from './../../../constants';
+import { t } from './../../../constants';
 
 const STYLES = {
   pulse: keyframes`
@@ -141,7 +141,7 @@ const AppLoadingScreen = ({ label = 'Loading ...' }: { label?: string }) => {
         </Box>
       </Box>
       <Typography
-        {...h5TypographyProps}
+        {...t.h5}
         sx={RUNTIME_STYLES.textWithShimmerEffect}
       >
         {label}

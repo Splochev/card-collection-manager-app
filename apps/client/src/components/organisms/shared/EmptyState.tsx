@@ -5,7 +5,7 @@ import { useState, type JSX } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CollectionIcon from '../../icons/CollectionIcon';
-import { body2TypographyProps, h5TypographyProps } from './../../../constants';
+import { t } from './../../../constants';
 
 const STYLES = {
   flexContainer: {
@@ -106,8 +106,8 @@ const EmptyState = ({
             <CollectionIcon color="inherit" size={50} />
           </Grid>
         </Grid>
-        <Typography {...h5TypographyProps}>{title}</Typography>
-        <Typography {...body2TypographyProps} sx={STYLES.description}>
+        <Typography {...t.h5}>{title}</Typography>
+        <Typography {...t.p.body2} sx={STYLES.description}>
           {description.split(/\r?\n/).map((line, idx) => (
             <span key={`description-${idx}`}>
               {line}

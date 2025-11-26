@@ -21,9 +21,7 @@ import {
   BACKEND_URL,
   BREAKPOINTS,
   ELEMENT_IDS,
-  body1TypographyProps,
-  body2TypographyProps,
-  h6h6TypographyProps,
+  t,
 } from '../../../constants';
 import WishlistManager from './WishlistManager';
 import SDK from '../../../sdk/SDK';
@@ -179,7 +177,7 @@ const CardListFromSet = () => {
 
   return (
     <Grid sx={STYLES.grid7}>
-      <Typography {...h6h6TypographyProps}>Other Cards from set</Typography>
+      <Typography {...t.h6}>Other Cards from set</Typography>
       <TextField
         label="Find cards"
         value={inputValue}
@@ -206,7 +204,7 @@ const CardListFromSet = () => {
         }}
       >
         {displayedCards.length === 0 && filterText.trim() !== '' ? (
-          <Typography {...body1TypographyProps} sx={STYLES.noCardsText}>
+          <Typography {...t.p.body1} sx={STYLES.noCardsText}>
             No cards found matching your search.
           </Typography>
         ) : (
@@ -319,20 +317,20 @@ const CardItem = memo(({ card }: { card: ICard }) => {
             </Grid>
           )}
           <Grid sx={STYLES.grid3}>
-            <Typography {...body2TypographyProps}>Name:</Typography>
-            <Typography {...body1TypographyProps} sx={STYLES.cardName}>
+            <Typography {...t.p.body2}>Name:</Typography>
+            <Typography {...t.p.body1} sx={STYLES.cardName}>
               {card?.name}
             </Typography>
           </Grid>
           <Grid sx={STYLES.grid5}>
-            <Typography {...body2TypographyProps}>Set Code:</Typography>
-            <Typography {...body1TypographyProps} sx={STYLES.cardDataBold}>
+            <Typography {...t.p.body2}>Set Code:</Typography>
+            <Typography {...t.p.body1} sx={STYLES.cardDataBold}>
               {card?.cardNumber}
             </Typography>
           </Grid>
           <Grid sx={STYLES.grid4}>
-            <Typography {...body2TypographyProps}>Quantity:</Typography>
-            <Typography {...body1TypographyProps} sx={STYLES.cardDataBold}>
+            <Typography {...t.p.body2}>Quantity:</Typography>
+            <Typography {...t.p.body1} sx={STYLES.cardDataBold}>
               {card?.count}
             </Typography>
           </Grid>

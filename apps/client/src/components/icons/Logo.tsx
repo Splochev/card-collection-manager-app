@@ -1,6 +1,7 @@
 import logo from '../../assets/logo.png';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ICON_SIZE_MAP, IconProps } from '../../constants';
+import { ICON_SIZE_MAP } from '../../constants';
+import type { IconProps } from '@card-collection-manager-app/shared';
 
 const Logo = ({ size = 'small', disableClick = false }: IconProps) => {
   const navigate = useNavigate();
@@ -32,9 +33,13 @@ const Logo = ({ size = 'small', disableClick = false }: IconProps) => {
       <img
         src={logo}
         alt="Logo"
-        className={ICON_SIZE_MAP[
-          typeof size === 'string' && size in ICON_SIZE_MAP ? size as keyof typeof ICON_SIZE_MAP : 'small'
-        ]}
+        className={
+          ICON_SIZE_MAP[
+            typeof size === 'string' && size in ICON_SIZE_MAP
+              ? (size as keyof typeof ICON_SIZE_MAP)
+              : 'small'
+          ]
+        }
         style={{
           transition: 'opacity 0.2s ease-in-out, transform 0.2s ease-in-out',
         }}

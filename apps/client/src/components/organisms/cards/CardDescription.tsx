@@ -1,5 +1,5 @@
 import Typography from '@mui/material/Typography';
-import { body2TypographyProps } from '../../../constants';
+import { t } from '../../../constants';
 
 const CardDescription = ({ desc }: { desc: string }) => {
   if (
@@ -13,7 +13,7 @@ const CardDescription = ({ desc }: { desc: string }) => {
     const pendulumText = pendulumMatch ? pendulumMatch[1].trim() : '';
     const monsterText = monsterMatch ? monsterMatch[1].trim() : '';
     return (
-      <Typography {...body2TypographyProps} noWrap={false}>
+      <Typography {...t.p.body2} noWrap={false}>
         <strong>Pendulum Effect</strong>
         <br />
         {pendulumText.split(/\r?\n/).map((line, idx) => (
@@ -35,7 +35,7 @@ const CardDescription = ({ desc }: { desc: string }) => {
     );
   }
   return (
-    <Typography {...body2TypographyProps} noWrap={false}>
+    <Typography {...t.p.body2} noWrap={false}>
       {desc.split('\r\n').map((line, index) => (
         <span key={`card-description-${index}`}>
           {line}

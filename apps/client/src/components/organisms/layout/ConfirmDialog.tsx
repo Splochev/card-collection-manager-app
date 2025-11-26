@@ -19,10 +19,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import {
-  body1TypographyProps,
-  h6h6TypographyProps,
-} from './../../../constants';
+import { t } from './../../../constants';
 
 const STYLES = {
   icon: {
@@ -73,14 +70,14 @@ const ConfirmDialog: React.FC = () => {
       <DialogTitle id="confirm-dialog-title">
         <Box sx={STYLES.titleBox}>
           {iconFor(state.variant)}
-          <Typography {...h6h6TypographyProps}>{state.title}</Typography>
+          <Typography {...t.h6}>{state.title}</Typography>
         </Box>
       </DialogTitle>
       <DialogContent>
         {getCustom(state.customKey) ? (
           <>{getCustom(state.customKey)}</>
         ) : (
-          <Typography {...body1TypographyProps}>{state.message}</Typography>
+          <Typography {...t.p.body1}>{state.message}</Typography>
         )}
       </DialogContent>
       <DialogActions>

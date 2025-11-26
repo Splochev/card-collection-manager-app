@@ -12,11 +12,7 @@ import {
   resetCollection,
 } from '../../stores/collectionSlice';
 import SDK from '../../sdk/SDK';
-import {
-  BACKEND_URL,
-  body2SpanTypographyProps,
-  h5TypographyProps,
-} from '../../constants';
+import { BACKEND_URL, t } from '../../constants';
 import CollectionToolbar from '../organisms/collection/CollectionToolbar';
 import CollectionCardGridItem from '../organisms/collection/CollectionCardGridItem';
 import CollectionCardListItem from '../organisms/collection/CollectionCardListItem';
@@ -181,12 +177,9 @@ const Collection = () => {
           <Box sx={STYLES.groupsContainer}>
             {groups.map((group) => (
               <Box key={group.groupKey}>
-                <Typography {...h5TypographyProps} sx={STYLES.groupKey}>
+                <Typography {...t.h5} sx={STYLES.groupKey}>
                   {group.groupKey}
-                  <Typography
-                    {...body2SpanTypographyProps}
-                    sx={STYLES.groupCardsCount}
-                  >
+                  <Typography {...t.p.body2} sx={STYLES.groupCardsCount}>
                     ({group.cards.length} card
                     {group.cards.length !== 1 ? 's' : ''})
                   </Typography>
