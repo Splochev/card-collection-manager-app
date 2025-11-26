@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import Grid from '@mui/material/Grid';
 import { toast } from 'react-toastify';
-import type { ICard } from '../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import SDK from '../../sdk/SDK';
 import { BACKEND_URL, CARD_SET_CODE_REGEX, ELEMENT_IDS } from '../../constants';
 import {

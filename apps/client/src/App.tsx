@@ -18,7 +18,23 @@ import {
   useHandleSignInCallback,
 } from '@logto/react';
 import Grid from '@mui/material/Grid';
-import { LOGTO_APP_ID, LOGTO_ENDPOINT, LOGTO_REDIRECT_URI, LOGTO_RESOURCE } from './constants';
+import {
+  LOGTO_APP_ID,
+  LOGTO_ENDPOINT,
+  LOGTO_REDIRECT_URI,
+  LOGTO_RESOURCE,
+} from './constants';
+
+const pageLayout = {
+  display: 'flex',
+  flexDirection: 'row',
+  width: '100%',
+  justifyContent: 'center',
+  alignItems: 'top',
+  gap: 2,
+  height: `100vh`,
+  overflowY: 'auto',
+};
 
 const config: LogtoConfig = {
   endpoint: LOGTO_ENDPOINT,
@@ -46,18 +62,7 @@ function CallbackPage() {
 
   if (isLoading) {
     return (
-      <Grid
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          justifyContent: 'center',
-          alignItems: 'top',
-          gap: 2,
-          height: `100vh`,
-          overflowY: 'auto',
-        }}
-      >
+      <Grid sx={pageLayout}>
         <AppLoadingScreen label="Redirecting..." />
       </Grid>
     );
@@ -67,7 +72,7 @@ function CallbackPage() {
 
 function ProtectedApp() {
   const theme = useSelector((state: RootState) =>
-    state.theme.mode === 'light' ? lightTheme : darkTheme
+    state.theme.mode === 'light' ? lightTheme : darkTheme,
   );
   const accessToken = useSelector((state: RootState) => state.user.accessToken);
   const dispatch = useDispatch();
@@ -104,18 +109,7 @@ function ProtectedApp() {
 
   if (isLoading || !isAuthenticated) {
     return (
-      <Grid
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          justifyContent: 'center',
-          alignItems: 'top',
-          gap: 2,
-          height: `100vh`,
-          overflowY: 'auto',
-        }}
-      >
+      <Grid sx={pageLayout}>
         <AppLoadingScreen
           label={!isAuthenticated ? 'Redirecting to login...' : 'Loading...'}
         />

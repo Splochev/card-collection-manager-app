@@ -11,7 +11,7 @@ import {
   ShoppingCart as ShoppingCartIcon,
   ZoomIn as ZoomInIcon,
 } from '@mui/icons-material';
-import type { ICard } from '../../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import SDK from '../../../sdk/SDK';
 import {
   BACKEND_URL,

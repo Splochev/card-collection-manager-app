@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { ICard } from '../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 
 export interface CardsState {
   cardSetPrefix: string | null;

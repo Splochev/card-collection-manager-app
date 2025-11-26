@@ -21,7 +21,7 @@ import CollectionToolbar from '../organisms/collection/CollectionToolbar';
 import CollectionCardGridItem from '../organisms/collection/CollectionCardGridItem';
 import CollectionCardListItem from '../organisms/collection/CollectionCardListItem';
 import { useSearchParams } from 'react-router-dom';
-import { ICard } from '../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import NoCardFound from '../organisms/collection/NoCardFound';
 import ZoomInCard from '../Dialogs/ZoomInCard';
 

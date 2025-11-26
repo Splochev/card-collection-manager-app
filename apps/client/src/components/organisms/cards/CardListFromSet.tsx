@@ -1,4 +1,4 @@
-import type { ICard } from '../../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Chips from '../../molecules/Chips';

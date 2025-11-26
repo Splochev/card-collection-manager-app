@@ -1,7 +1,7 @@
 import { Grid, useMediaQuery } from '@mui/material';
 import CardWrapper from '../../atoms/CardWrapper';
 import CoreNumber from '../../molecules/CoreNumber';
-import type { ICard } from '../../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import CardInfoHeader from './CardInfoHeader';
 import { BREAKPOINTS } from '../../../constants';
 

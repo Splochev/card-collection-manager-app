@@ -1,8 +1,8 @@
-import { ICard } from '../../interfaces/card.interface';
 import { Box, Dialog, DialogContent, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CardFullInfo from '../organisms/cards/CardFullInfo';
 import CardWrapper from '../atoms/CardWrapper';
+import type { ICard } from '@card-collection-manager-app/shared';
 
 const STYLES = {
   dialogContent: {

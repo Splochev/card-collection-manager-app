@@ -1,7 +1,7 @@
 import { Grid, Typography, Button, Box } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Chips from '../../molecules/Chips';
-import type { ICard } from '../../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 
 const STYLES = {
   grid: { width: '100%' },

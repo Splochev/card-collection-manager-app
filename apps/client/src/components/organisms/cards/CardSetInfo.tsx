@@ -1,7 +1,7 @@
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import type { ICard } from '../../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import {
   body1TypographyProps,
   body2TypographyProps,

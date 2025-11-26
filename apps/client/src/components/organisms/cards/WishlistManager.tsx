@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, IconButton } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import type { ICard } from '../../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import CoreNumber from '../../molecules/CoreNumber';
 
 const STYLES = {

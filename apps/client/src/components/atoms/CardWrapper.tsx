@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { useState } from 'react';
 import WishlistManager from '../organisms/cards/WishlistManager';
-import type { ICard } from '../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 
 const STYLES = {
   cardWrapper: { position: 'relative', width: '100%', overflow: 'hidden' },

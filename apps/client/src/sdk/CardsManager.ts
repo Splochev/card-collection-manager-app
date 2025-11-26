@@ -1,4 +1,4 @@
-import type { ICard } from '../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import axios from 'axios';
 import type SDK from './SDK';
 

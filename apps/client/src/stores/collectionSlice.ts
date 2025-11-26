@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { ICard } from '../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 
 export type GroupByType = 'cardName' | 'setName' | 'setCode';
 export type OrderByType = 'cardName' | 'setName' | 'setCode' | 'count';

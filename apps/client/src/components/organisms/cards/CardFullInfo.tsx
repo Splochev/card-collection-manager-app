@@ -1,7 +1,7 @@
 import { Grid, useMediaQuery } from '@mui/material';
 import CardSetInfo from './CardSetInfo';
 import CardStats from './CardStats';
-import type { ICard } from '../../../interfaces/card.interface';
+import type { ICard } from '@card-collection-manager-app/shared';
 import CardInfoHeader from './CardInfoHeader';
 
 const STYLES = {
