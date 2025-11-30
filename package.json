@@ -8,7 +8,8 @@
     "start:client": "nx build client && nx preview client",
     "client": "npx nx serve client",
     "server": "npx nx run @card-collection-manager-app/server:serve:dev",
-    "scraper": "npx nx serve scrape-service"
+    "scraper": "npx nx serve scrape-service",
+    "build:lib": "npx nx build @card-collection-manager-app/shared"
   },
   "private": true,
   "dependencies": {

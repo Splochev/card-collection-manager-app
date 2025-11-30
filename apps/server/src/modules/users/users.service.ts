@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from '../../database/entities/user.entity';
 import { UserCards } from '../../database/entities/users-cards.entity';
 import { Wishlist } from '../../database/entities/wishlist.entity';
-import { IRequest } from '../../interfaces/general/requst.interface';
+import type { IRequest } from '@card-collection-manager-app/shared';
 
 @Injectable()
 export class UsersService {

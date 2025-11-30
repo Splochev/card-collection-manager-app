@@ -16,7 +16,7 @@ import { CollectionQueryDto } from './dto/collection-query.dto';
 import { CollectionResponseDto } from './dto/collection-response.dto';
 import { CardEditions } from '../../database/entities/card-editions.entity';
 import { JwtAuthGuard } from '../../guards/logto-jwt.guard';
-import { IRequest } from '../../interfaces/general/requst.interface';
+import type { IRequest } from '@card-collection-manager-app/shared';
 import { User } from '../../database/entities/user.entity';
 
 @ApiTags('cards')

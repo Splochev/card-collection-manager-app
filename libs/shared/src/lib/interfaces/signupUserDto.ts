@@ -1,4 +1,4 @@
-export default interface SignupUserDto {
+export interface SignupUserDto {
   hookId: string;
   event: string;
   createdAt: string;

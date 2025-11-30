@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-import SignupUserDto from './dto/signup-user.dto';
+import { SignupUserDto } from '@card-collection-manager-app/shared';
 import { LogtoWebHookGuard } from '../../guards/logto-webhook.guard';
 
 @ApiTags('auth')
