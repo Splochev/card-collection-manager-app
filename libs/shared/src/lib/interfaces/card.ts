@@ -26,4 +26,6 @@ export interface ICard {
   archetype: string;
   count: number;
   wishlistCount?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  card_images?: any;
 }

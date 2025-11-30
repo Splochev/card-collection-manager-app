@@ -25,7 +25,6 @@ export class ScrapeGateway implements OnGatewayConnection, OnGatewayDisconnect {
   notifySearchFinished(
     payload: {
       collectionName: string;
-      count?: number;
       cardSetCode?: string;
     },
     socketId?: string,

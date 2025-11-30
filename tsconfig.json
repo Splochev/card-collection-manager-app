@@ -4,13 +4,7 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/client-e2e"
-    },
-    {
       "path": "./apps/client"
-    },
-    {
-      "path": "./apps/server-e2e"
     },
     {
       "path": "./apps/server"

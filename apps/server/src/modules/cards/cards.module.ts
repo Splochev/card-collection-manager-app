@@ -5,7 +5,6 @@ import { CardsService } from './cards.service';
 import { CardsController } from './cards.controller';
 import { WebsocketModule } from '../websocket/websocket.module';
 import { UsersService } from '../users/users.service';
-import { ScrapeService } from '../scrape/scrape.service';
 import { CardEditions } from '../../database/entities/card-editions.entity';
 import { CardEntity } from '../../database/entities/card.entity';
 import { User } from '../../database/entities/user.entity';
@@ -25,7 +24,7 @@ import { Wishlist } from '../../database/entities/wishlist.entity';
     WebsocketModule,
   ],
   controllers: [CardsController],
-  providers: [CardsService, UsersService, ScrapeService],
+  providers: [CardsService, UsersService],
   exports: [CardsService],
 })
 export class CardsModule {}

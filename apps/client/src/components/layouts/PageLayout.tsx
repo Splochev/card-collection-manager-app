@@ -107,10 +107,19 @@ export default function PageLayout() {
   };
 
   useEffect(() => {
-    const socket: Socket = io(`${BACKEND_URL}/card-manager`);
+    const socket: Socket = io(`${BACKEND_URL}/card-manager`, {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    });
 
     socket.on('connect', () => {
       socketIdRef.current = socket.id ?? '';
+    });
+
+    socket.on('disconnect', () => {
+      socketIdRef.current = '';
     });
 
     socket.on(
