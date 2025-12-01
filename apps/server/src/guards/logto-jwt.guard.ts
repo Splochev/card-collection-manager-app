@@ -8,15 +8,15 @@ import {
 import { Request } from 'express-serve-static-core';
 import * as jsonwebtoken from 'jsonwebtoken';
 import { JwtHeader } from 'jsonwebtoken';
+import * as jwksRsa from 'jwks-rsa';
+import { configDotenv } from 'dotenv';
+import * as path from 'path';
 
 declare module 'express-serve-static-core' {
   interface Request {
     userAuthId?: string;
   }
 }
-import * as jwksRsa from 'jwks-rsa';
-import { configDotenv } from 'dotenv';
-import * as path from 'path';
 
 const envPath = path.resolve(__dirname, '../../../../.env');
 configDotenv({ path: envPath });
@@ -94,8 +94,8 @@ const getKey = (
         error instanceof Error
           ? error.message
           : typeof error === 'string'
-          ? error
-          : JSON.stringify(error);
+            ? error
+            : JSON.stringify(error);
       callback(new Error(`Failed to get public key: ${errorMessage}`));
     }
   });

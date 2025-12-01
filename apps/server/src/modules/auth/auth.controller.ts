@@ -1,11 +1,8 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SignupUserDto } from '@card-collection-manager-app/shared';
 import { LogtoWebHookGuard } from '../../guards/logto-webhook.guard';
 
-@ApiTags('auth')
-@ApiBearerAuth('access-token')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
