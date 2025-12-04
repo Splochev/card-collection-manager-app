@@ -1,6 +1,15 @@
 import { DataSource } from 'typeorm';
+import { config } from 'dotenv';
+import { join } from 'path';
 import { CardEntity } from './entities/card.entity';
 import { CardEditions } from './entities/card-editions.entity';
+
+const isBuilt = __dirname.includes('dist');
+const envPath = isBuilt
+  ? join(__dirname, '..', '..', '..', '..', '.env')
+  : join(__dirname, '..', '.env');
+
+config({ path: envPath });
 
 export const AppDataSource = new DataSource({
   type: 'postgres',

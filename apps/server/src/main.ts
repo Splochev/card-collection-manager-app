@@ -1,7 +1,13 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
+// Load .env before any other imports
+import { config } from 'dotenv';
+import { join } from 'path';
+
+const isBuilt = __dirname.includes('dist');
+const envPath = isBuilt
+  ? join(__dirname, '..', '.env') // apps/server/dist -> apps/server/.env
+  : join(__dirname, '..', '.env'); // apps/server/src -> apps/server/.env
+
+config({ path: envPath });
 
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';

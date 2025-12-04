@@ -3,13 +3,22 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build:client": "nx build client",
-    "build:client:start": "nx preview client",
-    "start:client": "nx build client && nx preview client",
-    "client": "npx nx serve client",
-    "server": "npx nx run @card-collection-manager-app/server:serve:dev",
-    "scraper": "npx nx serve scrape-service",
-    "build:lib": "npx nx build @card-collection-manager-app/shared"
+    "build:client": "nx build @card-collection-manager-app/client",
+    "build:server": "nx build @card-collection-manager-app/server",
+    "build:scraper": "nx build @card-collection-manager-app/scrape-service",
+    "build:lib": "nx build @card-collection-manager-app/shared",
+
+    "start:client": "nx preview @card-collection-manager-app/client",
+    "start:server": "node apps/server/dist/main.js",
+    "start:scraper": "node apps/scrape-service/dist/main.js",
+
+    "bs:client": "npm run build:lib && npm run build:client && npm run start:client",
+    "bs:server": "npm run build:lib && npm run build:server && npm run start:server",
+    "bs:scraper": "npm run build:lib && npm run build:scraper && npm run start:scraper",
+
+    "client": "nx serve @card-collection-manager-app/client",
+    "server": "nx run @card-collection-manager-app/server:serve:dev",
+    "scraper": "nx serve @card-collection-manager-app/scrape-service"
   },
   "private": true,
   "dependencies": {

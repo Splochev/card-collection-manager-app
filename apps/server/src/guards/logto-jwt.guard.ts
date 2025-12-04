@@ -9,17 +9,12 @@ import { Request } from 'express-serve-static-core';
 import * as jsonwebtoken from 'jsonwebtoken';
 import { JwtHeader } from 'jsonwebtoken';
 import * as jwksRsa from 'jwks-rsa';
-import { configDotenv } from 'dotenv';
-import * as path from 'path';
 
 declare module 'express-serve-static-core' {
   interface Request {
     userAuthId?: string;
   }
 }
-
-const envPath = path.resolve(__dirname, '../../../../.env');
-configDotenv({ path: envPath });
 
 if (!process.env.LOGTO_AUDIENCE) {
   throw new Error('LOGTO_AUDIENCE environment variable is not set');
