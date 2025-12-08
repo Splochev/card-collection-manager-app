@@ -10,15 +10,13 @@ import CardSearchIcon from '../icons/CardSearchIcon';
 import CollectionIcon from '../icons/CollectionIcon';
 import FavoriteIcon from '../icons/FavoriteIcon';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { BREAKPOINTS, BACKEND_URL } from '../../constants';
+import { BREAKPOINTS } from '../../constants';
 import BottomNavigation from '../organisms/layout/BottomNavigation';
 import TopNavigation from '../organisms/layout/TopNavigation';
-import { useState, Suspense, lazy, useEffect, useRef } from 'react';
+import { useState, Suspense, lazy, useEffect } from 'react';
 import Grid from '@mui/material/Grid';
-import { io, type Socket } from 'socket.io-client';
-import { toast } from 'react-toastify';
 import AppLoadingScreen from '../organisms/shared/AppLoadingScreen';
-import SearchCardSetFinished from '../toasts/SearchCardSetFinished';
+import { useSocket } from '../../hooks/useSocket';
 
 type PageConfig = {
   label: string;
@@ -84,7 +82,7 @@ export default function PageLayout() {
   const isSmDown = useMediaQuery(BREAKPOINTS.SMALL_DOWN);
   const navigate = useNavigate();
   const location = useLocation();
-  const socketIdRef = useRef<string>('');
+  const { socketIdRef } = useSocket();
 
   const [value, setValue] = useState(() => {
     const idx = PAGES.findIndex((page) =>
@@ -105,41 +103,6 @@ export default function PageLayout() {
       navigate(page.path);
     }
   };
-
-  useEffect(() => {
-    const socket: Socket = io(`${BACKEND_URL}/card-manager`, {
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-    });
-
-    socket.on('connect', () => {
-      socketIdRef.current = socket.id ?? '';
-    });
-
-    socket.on('disconnect', () => {
-      socketIdRef.current = '';
-    });
-
-    socket.on(
-      'searchCardSetFinished',
-      async (payload: { collectionName: string; cardSetCode: string }) => {
-        toast.success(
-          <SearchCardSetFinished
-            collectionName={payload.collectionName}
-            cardSetCode={payload.cardSetCode}
-          />,
-          { autoClose: 8000 },
-        );
-      },
-    );
-
-    return () => {
-      socket.removeAllListeners();
-      socket.disconnect();
-    };
-  }, []);
 
   return (
     <Paper sx={STYLES.paper}>

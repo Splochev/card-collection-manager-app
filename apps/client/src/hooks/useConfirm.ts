@@ -1,11 +1,14 @@
 import { useCallback, createElement, type FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { showConfirm, closeConfirm } from '../stores/confirmSlice';
-import { registerResolver } from '../services/confirmService';
-import { registerCustom } from '../services/confirmService';
+import {
+  confirmService,
+  registerResolver,
+  registerCustom,
+} from '../services/confirmService';
 import type { ConfirmVariant } from '../stores/confirmSlice';
 
-type ConfirmOptions = {
+export type ConfirmOptions = {
   title?: string;
   message?: string;
   variant?: ConfirmVariant;
@@ -15,23 +18,45 @@ type ConfirmOptions = {
   custom?: FC | null;
 };
 
-const resolvers = new Map<string, { resolve: (v: boolean) => void }>();
+/**
+ * Generates a unique ID for confirmation dialogs.
+ */
+const generateConfirmId = (): string =>
+  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
+/**
+ * Hook to show confirmation dialogs.
+ * Provides a testable interface for confirmation functionality.
+ *
+ * @example
+ * const { confirm } = useConfirm();
+ *
+ * const handleDelete = async () => {
+ *   const confirmed = await confirm({
+ *     title: 'Delete Item',
+ *     message: 'Are you sure you want to delete this item?',
+ *     variant: 'warning',
+ *   });
+ *
+ *   if (confirmed) {
+ *     // Perform deletion
+ *   }
+ * };
+ */
 export const useConfirm = () => {
   const dispatch = useDispatch();
 
-  const makeId = () =>
-    `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-
   const confirm = useCallback(
-    (opts: ConfirmOptions) => {
-      const id = makeId();
+    (opts: ConfirmOptions): Promise<boolean> => {
+      const id = generateConfirmId();
 
       return new Promise<boolean>((resolve) => {
         registerResolver(id, resolve);
+
         if (opts.custom) {
           registerCustom(id, createElement(opts.custom));
         }
+
         dispatch(
           showConfirm({
             id,
@@ -55,11 +80,7 @@ export const useConfirm = () => {
 
   const resolve = useCallback(
     (id: string, value: boolean) => {
-      const r = resolvers.get(id);
-      if (r) {
-        r.resolve(value);
-        resolvers.delete(id);
-      }
+      confirmService.resolveConfirm(id, value);
       dispatch(closeConfirm());
     },
     [dispatch]

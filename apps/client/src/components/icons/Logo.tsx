@@ -17,7 +17,6 @@ const Logo = ({ size = 'small', disableClick = false }: IconProps) => {
     if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
       e.preventDefault();
       navigate(basePath);
-      window.location.reload();
     }
   };
 

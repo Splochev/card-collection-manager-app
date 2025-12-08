@@ -6,12 +6,11 @@ import Logo from '../../icons/Logo';
 import Grid from '@mui/material/Grid';
 import CoreInput from '../../molecules/CoreInput';
 import SearchIcon from '@mui/icons-material/Search';
-import debounce from 'lodash/debounce';
 import { getTabProps } from '../../../utils';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Box } from '@mui/material';
 import UserMenu from './UserMenu';
 import { PAGES } from '../../layouts/PageLayout';
+import { useNavigationSearch } from '../../../hooks/useNavigationSearch';
 
 const STYLES = {
   topNavigation: {
@@ -55,66 +54,9 @@ const TopNavigation = ({
   handleChange: (event: React.SyntheticEvent, newValue: number) => void;
   isSmDown: boolean;
 }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const [searchValue, setSearchValue] = React.useState('');
-
-  // Sync search input with URL
-  React.useEffect(() => {
-    if (location.pathname.includes(PAGES[0].path)) {
-      // For Cards page, read from URL path params
-      const cardSetCode = location.pathname.split('/cards/')[1];
-      const upperCaseCardSetCode = cardSetCode ? cardSetCode.toUpperCase() : '';
-      setSearchValue(upperCaseCardSetCode);
-    } else if (location.pathname.includes(PAGES[1].path)) {
-      // For Collection page, read from query params
-      const filter = searchParams.get('filter') || '';
-      setSearchValue(filter.toUpperCase());
-    } else {
-      // For other pages, clear search
-      setSearchValue('');
-    }
-  }, [location.pathname, searchParams]);
-
-  const handleSearch = React.useCallback(
-    (value: string) => {
-      const upperValue = value.toUpperCase();
-
-      if (location.pathname.includes(PAGES[0].path)) {
-        // For Cards page, update URL path
-        const newPath = upperValue ? `/cards/${upperValue}` : '/cards';
-        navigate(newPath);
-      } else if (location.pathname.includes(PAGES[1].path)) {
-        // For Collection page, update query params
-        const newParams = new URLSearchParams(searchParams);
-        if (upperValue) {
-          newParams.set('filter', upperValue);
-        } else {
-          newParams.delete('filter');
-        }
-        navigate(`${location.pathname}?${newParams.toString()}`, {
-          replace: true,
-        });
-      }
-    },
-    [location.pathname, navigate, searchParams],
-  );
-
-  const debouncedHandleSearch = React.useMemo(
-    () => debounce(handleSearch, 400),
-    [handleSearch],
-  );
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const upperValue = e.target.value.toUpperCase();
-    setSearchValue(upperValue);
-    debouncedHandleSearch(upperValue);
-  };
-
-  const label =
-    PAGES.find((page) => location.pathname.includes(page.path))?.searchLabel ||
-    'Search';
+  const { searchValue, handleInputChange, label } = useNavigationSearch({
+    pages: PAGES,
+  });
 
   return (
     <Paper sx={STYLES.topNavigation} elevation={3}>

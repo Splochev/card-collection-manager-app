@@ -1,32 +1,38 @@
 import type { ICard } from '@card-collection-manager-app/shared';
-import axios from 'axios';
 import type SDK from './SDK';
+import type { IHttpClient } from '../services/httpClient';
 
 /**
  * CardsManager - A class to handle card-related operations.
+ * Uses the SDK's HTTP client for making requests.
  */
 export default class CardsManager {
-  private systemUrl: string;
   private sdk: SDK;
 
-  constructor(systemUrl: string, sdk: SDK) {
-    this.systemUrl = systemUrl;
+  constructor(sdk: SDK) {
     this.sdk = sdk;
+  }
+
+  /**
+   * Gets the HTTP client from SDK.
+   */
+  private get httpClient(): IHttpClient {
+    return this.sdk.getHttpClient();
+  }
+
+  /**
+   * Gets the system URL from SDK.
+   */
+  private get systemUrl(): string {
+    return this.sdk.systemUrl;
   }
 
   /**
    * Retrieves cards by card set code.
    */
   async getCardsBySetCode(cardSetCode: string): Promise<ICard[]> {
-    const token = this.sdk.getToken();
-
-    const { data } = await axios.get<ICard[]>(
-      `${this.systemUrl}/cards/${cardSetCode}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+    const { data } = await this.httpClient.get<ICard[]>(
+      `${this.systemUrl}/cards/${cardSetCode}`
     );
     return data;
   }
@@ -36,17 +42,13 @@ export default class CardsManager {
    */
   async findCardSets(
     body: { cardSetNames: string[]; cardSetCode: string },
-    socketId?: string,
+    socketId?: string
   ): Promise<void> {
     const headers: Record<string, string> = {};
-    const token = this.sdk.getToken();
     if (socketId) headers['x-socket-id'] = socketId;
 
-    await axios.post<void>(`${this.systemUrl}/scrape`, body, {
-      headers: {
-        ...headers,
-        Authorization: `Bearer ${token}`,
-      },
+    await this.httpClient.post<void>(`${this.systemUrl}/scrape`, body, {
+      headers,
     });
   }
 
@@ -55,18 +57,12 @@ export default class CardsManager {
    */
   async addCardToCollection(
     cardSetCode: string,
-    quantity: number,
+    quantity: number
   ): Promise<void> {
-    const token = this.sdk.getToken();
-    await axios.post(
-      `${this.systemUrl}/cards`,
-      { cardSetCode, quantity },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+    await this.httpClient.post(`${this.systemUrl}/cards`, {
+      cardSetCode,
+      quantity,
+    });
   }
 
   /**
@@ -74,7 +70,7 @@ export default class CardsManager {
    */
   async onWishlistChange(
     cardSetCode: string,
-    quantity?: number,
+    quantity?: number
   ): Promise<void> {
     if (quantity && quantity > 0) {
       await this.addCardToWishlist(cardSetCode, quantity);
@@ -88,32 +84,20 @@ export default class CardsManager {
    */
   async addCardToWishlist(
     cardSetCode: string,
-    quantity: number,
+    quantity: number
   ): Promise<void> {
-    const token = this.sdk.getToken();
-    await axios.post(
-      `${this.systemUrl}/cards/wishlist`,
-      { cardSetCode, quantity },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
+    await this.httpClient.post(`${this.systemUrl}/cards/wishlist`, {
+      cardSetCode,
+      quantity,
+    });
   }
 
   /**
    * Removes a card from the user's wishlist.
    */
   async removeCardFromWishlist(cardSetCode: string): Promise<void> {
-    const token = this.sdk.getToken();
-    await axios({
-      method: 'delete',
-      url: `${this.systemUrl}/cards/wishlist`,
+    await this.httpClient.delete(`${this.systemUrl}/cards/wishlist`, {
       data: { cardSetCode },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
   }
 
@@ -136,8 +120,7 @@ export default class CardsManager {
     totalGroups: number;
     hasMore: boolean;
   }> {
-    const token = this.sdk.getToken();
-    const { data } = await axios.get<{
+    const { data } = await this.httpClient.get<{
       groups: Array<{
         groupKey: string;
         totalCount: number;
@@ -147,9 +130,6 @@ export default class CardsManager {
       hasMore: boolean;
     }>(`${this.systemUrl}/cards/collection/all`, {
       params,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     });
     return data;
   }
@@ -164,14 +144,8 @@ export default class CardsManager {
    * url ---> https://www.cardmarket.com/en/YuGiOh/Products/Singles/Quarter-Century-Stampede/Black-Metal-Dragon-V1-Super-Rare?language=1&minCondition=4
    */
   async getCardMarketplaceUrl(cardSetCode: string): Promise<string> {
-    const token = this.sdk.getToken();
-    const { data } = await axios.get<string>(
-      `${this.systemUrl}/cards/${cardSetCode}/marketplace-url`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+    const { data } = await this.httpClient.get<string>(
+      `${this.systemUrl}/cards/${cardSetCode}/marketplace-url`
     );
     return data;
   }

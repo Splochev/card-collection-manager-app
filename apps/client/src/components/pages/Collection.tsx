@@ -1,22 +1,13 @@
-import { useEffect, useCallback, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import type { RootState } from '../../stores/store';
-import {
-  setGroups,
-  appendGroups,
-  setTotalGroups,
-  setHasMore,
-  setIsLoading,
-  incrementOffset,
-  resetCollection,
-} from '../../stores/collectionSlice';
-import SDK from '../../sdk/SDK';
-import { BACKEND_URL, t } from '../../constants';
+import { useCollection } from '../../hooks/useCollection';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
+import { t } from '../../constants';
 import CollectionToolbar from '../organisms/collection/CollectionToolbar';
 import CollectionCardGridItem from '../organisms/collection/CollectionCardGridItem';
 import CollectionCardListItem from '../organisms/collection/CollectionCardListItem';
-import { useSearchParams } from 'react-router-dom';
 import type { ICard } from '@card-collection-manager-app/shared';
 import NoCardFound from '../organisms/collection/NoCardFound';
 import ZoomInCard from '../Dialogs/ZoomInCard';
@@ -78,92 +69,23 @@ const STYLES = {
   },
 };
 
-const sdk = SDK.getInstance(BACKEND_URL);
-
 const Collection = () => {
-  const dispatch = useDispatch();
   const [zoomInCard, setZoomInCard] = useState<ICard | null>(null);
-  const [searchParams] = useSearchParams();
-  const urlFilter = searchParams.get('filter') || '';
-
+  const { groups, viewMode } = useSelector(
+    (state: RootState) => state.collection
+  );
   const {
-    groups,
-    groupBy,
-    orderBy,
-    sortType,
-    viewMode,
-    filter,
-    offset,
-    limit,
+    isLoading,
+    hasMore,
+    hasActiveFilter,
+    handleRefresh,
+    loadMore,
+  } = useCollection();
+  const { observerTarget } = useInfiniteScroll({
     hasMore,
     isLoading,
-  } = useSelector((state: RootState) => state.collection);
-
-  const observerTarget = useRef<HTMLDivElement>(null);
-  const hasActiveFilter = Boolean(urlFilter || filter);
-
-  const fetchCollection = useCallback(
-    async (append = false) => {
-      dispatch(setIsLoading(true));
-      try {
-        const response = await sdk.cardsManager.getMyCollection({
-          filter: urlFilter || filter,
-          limit,
-          offset: append ? offset : 0,
-          groupBy,
-          orderBy,
-          sortType,
-        });
-
-        if (append) {
-          dispatch(appendGroups(response.groups));
-        } else {
-          dispatch(setGroups(response.groups));
-        }
-        dispatch(setTotalGroups(response.totalGroups));
-        dispatch(setHasMore(response.hasMore));
-      } catch (error) {
-        console.error('Failed to fetch collection:', error);
-      } finally {
-        dispatch(setIsLoading(false));
-      }
-    },
-    [dispatch, filter, urlFilter, limit, offset, groupBy, orderBy, sortType],
-  );
-
-  const handleRefresh = useCallback(() => {
-    dispatch(resetCollection());
-    fetchCollection(false);
-  }, [dispatch, fetchCollection]);
-
-  useEffect(() => {
-    dispatch(resetCollection());
-    fetchCollection(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupBy, orderBy, sortType, urlFilter]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          dispatch(incrementOffset());
-          fetchCollection(true);
-        }
-      },
-      { threshold: 0.1 },
-    );
-
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
-
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
-    };
-  }, [hasMore, isLoading, dispatch, fetchCollection]);
+    onLoadMore: loadMore,
+  });
 
   if (!isLoading && groups.length === 0) {
     return <NoCardFound hasActiveFilter={hasActiveFilter} />;

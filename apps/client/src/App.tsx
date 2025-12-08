@@ -11,6 +11,7 @@ import PageLayout from './components/layouts/PageLayout';
 import ScrollbarStyles from './components/atoms/ScrollbarStyles';
 import ConfirmDialog from './components/organisms/layout/ConfirmDialog';
 import AppLoadingScreen from './components/organisms/shared/AppLoadingScreen';
+import { SDKProvider } from './contexts/SDKContext';
 import {
   LogtoProvider,
   type LogtoConfig,
@@ -93,7 +94,7 @@ function ProtectedApp() {
           dispatch(setUser(user));
 
           const token = await getAccessToken(LOGTO_RESOURCE);
-          dispatch(setAccessToken(token));
+          dispatch(setAccessToken(token ?? null));
         } catch (err) {
           console.error('Failed to fetch user or token', err);
         }
@@ -118,12 +119,14 @@ function ProtectedApp() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <ScrollbarStyles />
-      <PageLayout />
-      <ConfirmDialog />
-      <ToastContainer />
-    </ThemeProvider>
+    <SDKProvider>
+      <ThemeProvider theme={theme}>
+        <ScrollbarStyles />
+        <PageLayout />
+        <ConfirmDialog />
+        <ToastContainer />
+      </ThemeProvider>
+    </SDKProvider>
   );
 }
 
