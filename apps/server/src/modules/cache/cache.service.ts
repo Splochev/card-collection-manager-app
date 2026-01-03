@@ -9,7 +9,6 @@ export class CacheService {
     return this.redisService.get<T>(key);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async set(key: string, value: any, ttlInSeconds = 300): Promise<void> {
     await this.redisService.set(key, value, ttlInSeconds);
   }

@@ -22,11 +22,11 @@ export const resetUserSliceStorage = (): void => {
 };
 
 export interface UserState {
-  user: unknown;
+  user: any;
   accessToken: string | null;
 }
 
-const getInitialUser = (): unknown => {
+const getInitialUser = (): any => {
   const saved = storage.getItem('user');
   return saved ? JSON.parse(saved) : null;
 };

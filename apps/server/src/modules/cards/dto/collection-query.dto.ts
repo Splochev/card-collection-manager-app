@@ -1,23 +1,6 @@
 import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
-
-export enum GroupByType {
-  CARD_NAME = 'cardName',
-  SET_NAME = 'setName',
-  SET_CODE = 'setCode',
-}
-
-export enum OrderByType {
-  CARD_NAME = 'cardName',
-  SET_NAME = 'setName',
-  SET_CODE = 'setCode',
-  COUNT = 'count',
-}
-
-export enum SortType {
-  ASC = 'ASC',
-  DESC = 'DESC',
-}
+import { GroupByType, OrderByType, SortType } from '@card-collection-manager-app/shared';
 
 export class CollectionQueryDto {
   @IsOptional()

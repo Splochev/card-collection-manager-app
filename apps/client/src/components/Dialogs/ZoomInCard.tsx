@@ -13,11 +13,19 @@ const STYLES = {
     background: '#222',
     overflow: 'visible',
     gap: 4,
+    position: 'relative',
   },
   cardWrapperBox: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 8,
+    top: 8,
+    color: 'white',
+    zIndex: 2,
   },
 };
 
@@ -35,17 +43,11 @@ const ZoomInCard = ({
       maxWidth="sm"
       fullWidth
     >
-      <DialogContent sx={{ ...STYLES.dialogContent, position: 'relative' }}>
+      <DialogContent sx={STYLES.dialogContent}>
         <IconButton
           aria-label="close"
           onClick={() => setZoomInCard(null)}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: 'white',
-            zIndex: 2,
-          }}
+          sx={STYLES.closeButton}
         >
           <CloseIcon />
         </IconButton>

@@ -12,17 +12,11 @@ import {
   ZoomIn as ZoomInIcon,
 } from '@mui/icons-material';
 import type { ICard } from '@card-collection-manager-app/shared';
-import SDK from '../../../sdk/SDK';
-import {
-  BACKEND_URL,
-  t,
-} from '../../../constants';
-import { toast } from 'react-toastify';
-import { useState, useEffect, Fragment } from 'react';
-import { useDispatch } from 'react-redux';
-import { updateCardCount } from '../../../stores/collectionSlice';
+import { t } from '../../../constants';
+import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CoreNumber from '../../molecules/CoreNumber';
+import { useCollectionCardCount } from '../../../hooks/useCollectionCardCount';
 
 const STYLES = {
   paper0: {
@@ -121,8 +115,6 @@ const iconPaperProps = {
   sx: STYLES.iconPaper,
 };
 
-const sdk = SDK.getInstance(BACKEND_URL);
-
 const WrappedBox = ({ children }: { children: React.ReactNode }) => (
   <Box sx={STYLES.mobileActionsWrapper}>{children}</Box>
 );
@@ -134,51 +126,15 @@ const CollectionCardGridItem = ({
   card: ICard;
   onZoomIn: (card: ICard | null) => void;
 }) => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [localCount, setLocalCount] = useState(card.count);
-  const [visibleCount, setVisibleCount] = useState(card.count);
+  const { localCount, setLocalCount, visibleCount, setVisibleCount } =
+    useCollectionCardCount(card);
   const isMobile = useMediaQuery('(max-width:445px)');
   const Wrapper = isMobile ? WrappedBox : Fragment;
   const handleNavigate = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate(`/cards/${card.cardNumber}`);
   };
-
-  useEffect(() => {
-    setLocalCount(card.count);
-  }, [card.count]);
-
-  useEffect(() => {
-    const updateCard = async () => {
-      if (localCount !== card.count) {
-        try {
-          await sdk.cardsManager.addCardToCollection(
-            card.cardNumber,
-            localCount,
-          );
-          dispatch(
-            updateCardCount({
-              cardId: card.id,
-              cardNumber: card.cardNumber,
-              newCount: localCount,
-            }),
-          );
-
-          if (localCount === 0) {
-            toast.info(`Removed ${card.name} from collection`);
-          } else {
-            toast.success(`Updated ${card.name} to ${localCount}x`);
-          }
-        } catch (error) {
-          console.error('Error updating card count:', error);
-          toast.error('Failed to update card count');
-          setLocalCount(card.count);
-        }
-      }
-    };
-    updateCard();
-  }, [localCount, card.count, card.cardNumber, card.id, card.name, dispatch]);
 
   const buttons = [
     {

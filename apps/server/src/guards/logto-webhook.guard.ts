@@ -20,7 +20,6 @@ export function LogtoWebHookGuard(envkey: string) {
       }
 
       const req = context.switchToHttp().getRequest<Request>();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rawBody = req.body as unknown as Record<string, any>;
       if (!rawBody) throw new Error('Raw body is not available in the request');
 

@@ -9,6 +9,7 @@ export default [
     rules: {
       // Disable enforce-module-boundaries for this app to avoid false positives on external imports
       '@nx/enforce-module-boundaries': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ];

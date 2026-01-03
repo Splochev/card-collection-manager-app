@@ -129,3 +129,21 @@ export const SKIP_URLS: Record<string, number> = {
   'https://yugioh.fandom.com/wiki/Video_Game_Promotional_Cards_-_Sony_Playstation_Portable_(PSP)': 1,
   'https://yugioh.fandom.com/wiki/Duel_Terminal': 1,
 };
+
+export enum GroupByType {
+  CARD_NAME = 'cardName',
+  SET_NAME = 'setName',
+  SET_CODE = 'setCode',
+}
+
+export enum OrderByType {
+  CARD_NAME = 'cardName',
+  SET_NAME = 'setName',
+  SET_CODE = 'setCode',
+  COUNT = 'count',
+}
+
+export enum SortType {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}

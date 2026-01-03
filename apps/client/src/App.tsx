@@ -2,10 +2,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { type RootState } from './stores/store';
-import { setUser, setAccessToken } from './stores/userSlice';
 import { lightTheme, darkTheme } from './themes';
 import PageLayout from './components/layouts/PageLayout';
 import ScrollbarStyles from './components/atoms/ScrollbarStyles';
@@ -15,16 +13,15 @@ import { SDKProvider } from './contexts/SDKContext';
 import {
   LogtoProvider,
   type LogtoConfig,
-  useLogto,
   useHandleSignInCallback,
 } from '@logto/react';
 import Grid from '@mui/material/Grid';
 import {
   LOGTO_APP_ID,
   LOGTO_ENDPOINT,
-  LOGTO_REDIRECT_URI,
   LOGTO_RESOURCE,
 } from './constants';
+import { useAuth } from './hooks/useAuth';
 
 const pageLayout = {
   display: 'flex',
@@ -75,38 +72,7 @@ function ProtectedApp() {
   const theme = useSelector((state: RootState) =>
     state.theme.mode === 'light' ? lightTheme : darkTheme,
   );
-  const accessToken = useSelector((state: RootState) => state.user.accessToken);
-  const dispatch = useDispatch();
-  const { signIn, isAuthenticated, isLoading, fetchUserInfo, getAccessToken } =
-    useLogto();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      signIn(LOGTO_REDIRECT_URI);
-    }
-  }, [isLoading, isAuthenticated, signIn]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      (async () => {
-        try {
-          const user = await fetchUserInfo();
-          dispatch(setUser(user));
-
-          const token = await getAccessToken(LOGTO_RESOURCE);
-          dispatch(setAccessToken(token ?? null));
-        } catch (err) {
-          console.error('Failed to fetch user or token', err);
-        }
-      })();
-    }
-  }, [isAuthenticated, fetchUserInfo, getAccessToken, dispatch]);
-
-  useEffect(() => {
-    if (accessToken) {
-      localStorage.setItem('accessToken', JSON.stringify(accessToken));
-    }
-  }, [accessToken]);
+  const { isLoading, isAuthenticated } = useAuth();
 
   if (isLoading || !isAuthenticated) {
     return (

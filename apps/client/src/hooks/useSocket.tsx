@@ -1,8 +1,24 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { io, type Socket } from 'socket.io-client';
+import { io, type Socket, type ManagerOptions, type SocketOptions } from 'socket.io-client';
 import { toast } from 'react-toastify';
 import { BACKEND_URL } from '../constants';
 import SearchCardSetFinished from '../components/toasts/SearchCardSetFinished';
+
+/**
+ * Socket factory function type for dependency injection.
+ * Enables mocking in tests.
+ */
+export type SocketFactory = (
+  url: string,
+  options?: Partial<ManagerOptions & SocketOptions>
+) => Socket;
+
+/**
+ * Default socket factory using socket.io-client.
+ */
+export const defaultSocketFactory: SocketFactory = (url, options) => {
+  return io(url, options);
+};
 
 export interface UseSocketOptions {
   /**
@@ -20,6 +36,16 @@ export interface UseSocketOptions {
    * @default true
    */
   enabled?: boolean;
+  /**
+   * Custom socket factory for testing.
+   * @default defaultSocketFactory
+   */
+  socketFactory?: SocketFactory;
+  /**
+   * Custom handler for search card set finished events.
+   * Useful for testing to avoid toast side effects.
+   */
+  onSearchCardSetFinished?: (payload: SearchCardSetFinishedPayload) => void;
 }
 
 export interface UseSocketResult {
@@ -45,18 +71,28 @@ export interface SearchCardSetFinishedPayload {
  * @example
  * const { socketId, socketIdRef } = useSocket();
  * // Use socketIdRef.current in callbacks
+ *
+ * @example
+ * // Testing with mock socket
+ * const mockSocket = createMockSocket();
+ * const { socketId } = useSocket({
+ *   socketFactory: () => mockSocket,
+ *   onSearchCardSetFinished: jest.fn(),
+ * });
  */
 export function useSocket(options: UseSocketOptions = {}): UseSocketResult {
   const {
     url = BACKEND_URL,
     namespace = '/card-manager',
     enabled = true,
+    socketFactory = defaultSocketFactory,
+    onSearchCardSetFinished,
   } = options;
 
   const socketIdRef = useRef<string>('');
   const socketRef = useRef<Socket | null>(null);
 
-  const handleSearchCardSetFinished = useCallback(
+  const defaultSearchCardSetFinishedHandler = useCallback(
     (payload: SearchCardSetFinishedPayload) => {
       toast.success(
         <SearchCardSetFinished
@@ -69,12 +105,15 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketResult {
     []
   );
 
+  const handleSearchCardSetFinished =
+    onSearchCardSetFinished ?? defaultSearchCardSetFinishedHandler;
+
   useEffect(() => {
     if (!enabled) {
       return;
     }
 
-    const socket: Socket = io(`${url}${namespace}`, {
+    const socket: Socket = socketFactory(`${url}${namespace}`, {
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
@@ -98,7 +137,7 @@ export function useSocket(options: UseSocketOptions = {}): UseSocketResult {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [url, namespace, enabled, handleSearchCardSetFinished]);
+  }, [url, namespace, enabled, socketFactory, handleSearchCardSetFinished]);
 
   return {
     socketId: socketIdRef.current,
