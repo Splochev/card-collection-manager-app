@@ -25,3 +25,6 @@ const output = [...counts.entries()]
 fs.writeFileSync(path.join(__dirname, 'merged-list.txt'), output + '\n');
 console.log('Merged list has been written to merged-list.txt');
 console.log('Total card count:', [...counts.values()].reduce((a, b) => a + b, 0));
+
+fs.writeFileSync(path.join(__dirname, 'list.txt'), '');
+console.log('list.txt has been cleared');
