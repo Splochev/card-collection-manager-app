@@ -50,3 +50,4 @@ test-output
 .nx/
 *.env
 logs
+**/merged-list.txt

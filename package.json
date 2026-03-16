@@ -18,7 +18,8 @@
 
     "client": "nx serve @card-collection-manager-app/client",
     "server": "nx run @card-collection-manager-app/server:serve:dev",
-    "scraper": "nx serve @card-collection-manager-app/scrape-service"
+    "scraper": "nx serve @card-collection-manager-app/scrape-service",
+    "mergeList": "node merge-list/merge-list.js"
   },
   "private": true,
   "dependencies": {
