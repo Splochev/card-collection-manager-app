@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { CardEditions } from './card-editions.entity';
+import { CardEntity } from './card.entity';
 
 @Entity('wishlist')
 @Unique(['cardEditionId', 'userId'])
@@ -22,11 +23,18 @@ export class Wishlist {
   cardEditionId!: number;
 
   @Column({ nullable: false })
+  cardId!: number;
+
+  @Column({ nullable: false })
   userId!: number;
 
   @ManyToOne(() => CardEditions, { nullable: false })
   @JoinColumn({ name: 'cardEditionId' })
   cardEdition!: CardEditions;
+
+  @ManyToOne(() => CardEntity, { nullable: false })
+  @JoinColumn({ name: 'cardId' })
+  card!: CardEntity;
 
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'userId' })

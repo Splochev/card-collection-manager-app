@@ -1,4 +1,4 @@
-import type { ICard } from '@card-collection-manager-app/shared';
+import type { ICard, IWishlistCard } from '@card-collection-manager-app/shared';
 import type SDK from './SDK';
 import type { IHttpClient } from '../services/httpClient';
 
@@ -132,6 +132,25 @@ export default class CardsManager {
       params,
     });
     return data;
+  }
+
+  /**
+   * Gets the user's wishlist grouped by card.
+   */
+  async getWishlist(): Promise<IWishlistCard[]> {
+    const { data } = await this.httpClient.get<IWishlistCard[]>(
+      `${this.systemUrl}/cards/wishlist`
+    );
+    return data;
+  }
+
+  /**
+   * Merges a parsed wishlist into the user's existing wishlist.
+   */
+  async mergeWishlist(items: { name: string; count: number }[]): Promise<void> {
+    await this.httpClient.post(`${this.systemUrl}/cards/wishlist/merge`, {
+      items,
+    });
   }
 
   /**

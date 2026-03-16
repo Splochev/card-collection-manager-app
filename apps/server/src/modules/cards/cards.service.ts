@@ -381,13 +381,14 @@ export class CardsService {
       return;
     }
 
-    const wishlistItem = this.wishlistRepository.create({
-      userId,
-      cardEditionId: cardEdition.id,
-      count: quantity,
-    });
-
-    await this.wishlistRepository.save(wishlistItem);
+    await this.wishlistRepository.save(
+      this.wishlistRepository.create({
+        userId,
+        cardEditionId: cardEdition.id,
+        count: quantity,
+        cardId: cardEdition.cardId,
+      }),
+    );
 
     // Clear cache
     const cardSetCacheKey = `card-set:${userId}:${cardEdition.cardSetName}`;
@@ -409,5 +410,53 @@ export class CardsService {
     // Clear cache
     const cardSetCacheKey = `card-set:${userId}:${cardEdition.cardSetName}`;
     await this.cacheService.del(cardSetCacheKey);
+  }
+
+  async mergeWishlist(
+    items: { name: string; count: number }[],
+    userId: number,
+  ): Promise<void> {
+    for (const item of items) {
+      const cardEdition = await this.cardEditionsRepository
+        .createQueryBuilder('ce')
+        .innerJoin('ce.cards', 'c')
+        .where('c.name ILIKE :name', { name: item.name })
+        .getOne();
+
+      if (!cardEdition) continue;
+
+      const existingItem = await this.wishlistRepository.findOne({
+        where: { userId, cardEditionId: cardEdition.id },
+      });
+
+      if (existingItem) {
+        existingItem.count += item.count;
+        await this.wishlistRepository.save(existingItem);
+      } else {
+        await this.wishlistRepository.save(
+          this.wishlistRepository.create({
+            userId,
+            cardEditionId: cardEdition.id,
+            cardId: cardEdition.cardId,
+            count: item.count,
+          }),
+        );
+      }
+    }
+  }
+
+  async getWishlist(userId: number): Promise<(CardEntity & { total_count: number })[]> {
+    const rows = await this.wishlistRepository
+      .createQueryBuilder('w')
+      .select('w."cardId"')
+      .addSelect('CAST(SUM(w.count) AS INTEGER)', 'total_count')
+      .addSelect('c.*')
+      .leftJoin(CardEntity, 'c', 'c.id = w."cardId"')
+      .where('w."userId" = :userId', { userId })
+      .groupBy('w."cardId"')
+      .addGroupBy('c."imageUrl"')
+      .addGroupBy('c.id')
+      .getRawMany();
+    return rows;
   }
 }

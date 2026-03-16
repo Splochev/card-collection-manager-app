@@ -6,5 +6,6 @@ export type { ScrapeCardDto } from './interfaces/scrapeCardDto';
 export type { CardApiResponse } from './interfaces/cardApiResponse';
 export type { CardQueryDto } from './interfaces/cardQueryDto';
 export type { IRequest } from './interfaces/iRequest';
+export type { IWishlistCard } from './interfaces/wishlistCard';
 export type { SignupUserDto } from './interfaces/signupUserDto';
 export type { IconProps } from './types/IconProps';

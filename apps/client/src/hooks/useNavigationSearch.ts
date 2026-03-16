@@ -27,6 +27,11 @@ export interface UseNavigationSearchOptions {
    * @default 1
    */
   collectionPageIndex?: number;
+  /**
+   * Index of the wishlist page (uses query params).
+   * @default 2
+   */
+  wishlistPageIndex?: number;
 }
 
 export interface UseNavigationSearchResult {
@@ -65,6 +70,7 @@ export function useNavigationSearch(
     debounceMs = 400,
     cardsPageIndex = 0,
     collectionPageIndex = 1,
+    wishlistPageIndex = 2,
   } = options;
 
   const location = useLocation();
@@ -74,6 +80,7 @@ export function useNavigationSearch(
 
   const cardsPage = pages[cardsPageIndex];
   const collectionPage = pages[collectionPageIndex];
+  const wishlistPage = pages[wishlistPageIndex];
 
   // Sync search input with URL
   useEffect(() => {
@@ -89,11 +96,15 @@ export function useNavigationSearch(
       // For Collection page, read from query params
       const filter = searchParams.get('filter') || '';
       setSearchValue(filter.toUpperCase());
+    } else if (wishlistPage && location.pathname.includes(wishlistPage.path)) {
+      // For Wishlist page, read from query params
+      const filter = searchParams.get('filter') || '';
+      setSearchValue(filter.toUpperCase());
     } else {
       // For other pages, clear search
       setSearchValue('');
     }
-  }, [location.pathname, searchParams, cardsPage, collectionPage]);
+  }, [location.pathname, searchParams, cardsPage, collectionPage, wishlistPage]);
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -119,9 +130,20 @@ export function useNavigationSearch(
         navigate(`${location.pathname}?${newParams.toString()}`, {
           replace: true,
         });
+      } else if (wishlistPage && location.pathname.includes(wishlistPage.path)) {
+        // For Wishlist page, update query params
+        const newParams = new URLSearchParams(searchParams);
+        if (upperValue) {
+          newParams.set('filter', upperValue);
+        } else {
+          newParams.delete('filter');
+        }
+        navigate(`${location.pathname}?${newParams.toString()}`, {
+          replace: true,
+        });
       }
     },
-    [location.pathname, navigate, searchParams, cardsPage, collectionPage]
+    [location.pathname, navigate, searchParams, cardsPage, collectionPage, wishlistPage]
   );
 
   const debouncedHandleSearch = useMemo(

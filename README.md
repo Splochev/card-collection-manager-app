@@ -8,6 +8,7 @@ npx nx g @nx/js:application <name> --directory=apps/<name> --no-interactive
 npm install
 
 # To start app:
+npm run scraper
 npm run client
 npm run server
 
