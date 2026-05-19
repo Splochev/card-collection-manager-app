@@ -51,3 +51,5 @@ test-output
 *.env
 logs
 **/merged-list.txt
+.claude/worktrees
+.claude/settings.local.json
