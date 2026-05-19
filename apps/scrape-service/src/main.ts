@@ -24,27 +24,6 @@ const consumer = kafka.consumer({
   groupId: MICROSERVICES_GROUPS.SCRAPE_GROUP,
 });
 
-async function handleScrapeCards(payload: any) {
-  await scrapeCards(payload.cardSetNames);
-  await producer.send({
-    topic: SCRAPE_TOPICS.SCRAPE_CARDS_FINISHED,
-    messages: [
-      {
-        value: JSON.stringify({
-          socketId: payload.socketId,
-          cardSetCode: payload.cardSetCode,
-          collectionName: payload.cardSetNames[0],
-        }),
-      },
-    ],
-  });
-  await migrateMarketURLs();
-}
-
-async function handleMigrateMarketURLs() {
-  await migrateMarketURLs();
-}
-
 const producer = kafka.producer();
 
 async function run() {
@@ -73,3 +52,24 @@ async function run() {
 }
 
 run().catch(console.error);
+
+async function handleScrapeCards(payload: any) {
+  await scrapeCards(payload.cardSetNames);
+  await producer.send({
+    topic: SCRAPE_TOPICS.SCRAPE_CARDS_FINISHED,
+    messages: [
+      {
+        value: JSON.stringify({
+          socketId: payload.socketId,
+          cardSetCode: payload.cardSetCode,
+          collectionName: payload.cardSetNames[0],
+        }),
+      },
+    ],
+  });
+  await migrateMarketURLs();
+}
+
+async function handleMigrateMarketURLs() {
+  await migrateMarketURLs();
+}
