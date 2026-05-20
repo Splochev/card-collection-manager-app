@@ -36,6 +36,9 @@ async function run() {
   });
   await consumer.subscribe({
     topic: SCRAPE_TOPICS.MIGRATE_MARKET_URLS,
+    // fromBeginning is for testing purposes, in production we only want to consume new messages
+    // if fromBeginning is true, the consumer will consume all messages
+    // from the beginning of the topic, even if they were produced before the consumer started consuming
     fromBeginning: false,
   });
 
