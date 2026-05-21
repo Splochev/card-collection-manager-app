@@ -7,19 +7,17 @@
     "build:server": "nx build @card-collection-manager-app/server",
     "build:scraper": "nx build @card-collection-manager-app/scrape-service",
     "build:lib": "nx build @card-collection-manager-app/shared",
-
     "start:client": "nx preview @card-collection-manager-app/client",
     "start:server": "node apps/server/dist/main.js",
     "start:scraper": "node apps/scrape-service/dist/main.js",
-
     "bs:client": "npm run build:lib && npm run build:client && npm run start:client",
     "bs:server": "npm run build:lib && npm run build:server && npm run start:server",
     "bs:scraper": "npm run build:lib && npm run build:scraper && npm run start:scraper",
-
     "client": "nx serve @card-collection-manager-app/client",
     "server": "nx run @card-collection-manager-app/server:serve:dev",
     "scraper": "nx serve @card-collection-manager-app/scrape-service",
-    "mergeList": "node merge-list/merge-list.js"
+    "mergeList": "node merge-list/merge-list.js",
+    "test:client": "nx test @card-collection-manager-app/client"
   },
   "private": true,
   "dependencies": {
@@ -86,6 +84,7 @@
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
     "@testing-library/dom": "10.4.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "16.3.0",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.4",

@@ -3,4 +3,5 @@ import { getJestProjectsAsync } from '@nx/jest';
 
 export default async (): Promise<Config> => ({
   projects: await getJestProjectsAsync(),
+  setupFiles: ['<rootDir>/jest.setup.js'],
 });
