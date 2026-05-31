@@ -3,7 +3,7 @@ import { useCardsManager } from '../../contexts/SDKContext';
 import { renderHook, act } from '@testing-library/react';
 import { useCardActions } from '../../hooks/useCardActions';
 import type { ICard } from '@card-collection-manager-app/shared';
-import { updateCardWishlist } from '../../stores/cardSlice';
+import { updateCardWishlist, updateCardCount } from '../../stores/cardSlice';
 import { toast } from 'react-toastify';
 
 jest.mock('react-redux', () => ({
@@ -95,7 +95,7 @@ describe('useCardActions', () => {
     expect(result.current.quantity).toBe(3);
   });
 
-  it('does not perform any actions when searchedCard is undefined', async () => {
+  it('performs no actions when searchedCard is undefined [handleAddToWishlist]', async () => {
     mockSearchedCard = undefined as unknown as ICard;
 
     const { result } = renderHook(() =>
@@ -111,13 +111,14 @@ describe('useCardActions', () => {
     expect(mockSetSearchedCard).toHaveBeenCalledTimes(0);
     expect(mockDispatch).toHaveBeenCalledTimes(0);
     expect(mockCardsManager.addCardToWishlist).toHaveBeenCalledTimes(0);
+    expect(toast.success).toHaveBeenCalledTimes(0);
 
     expect(() => {
       result.current.handleAddToWishlist(3);
     }).not.toThrow();
   });
 
-  it('calls setSearchedCard with updated wishlistCount when handleAddToWishlist is called', async () => {
+  it('calls setSearchedCard with updated wishlistCount [handleAddToWishlist]', async () => {
     const { result } = renderHook(() =>
       useCardActions({
         searchedCard: mockSearchedCard,
@@ -134,7 +135,7 @@ describe('useCardActions', () => {
     } as unknown as ICard);
   });
 
-  it('calls cardsManager.addCardToWishlist with updated wishlistCount when handleAddToWishlist is called', async () => {
+  it('calls cardsManager.addCardToWishlist with updated wishlistCount [handleAddToWishlist]', async () => {
     const { result } = renderHook(() =>
       useCardActions({
         searchedCard: mockSearchedCard,
@@ -151,7 +152,7 @@ describe('useCardActions', () => {
     );
   });
 
-  it("calls reducer's updateCardWishlist with updated wishlistCount when handleAddToWishlist is called", async () => {
+  it("calls reducer's updateCardWishlist with updated wishlistCount [handleAddToWishlist]", async () => {
     const { result } = renderHook(() =>
       useCardActions({
         searchedCard: mockSearchedCard,
@@ -170,7 +171,7 @@ describe('useCardActions', () => {
     );
   });
 
-  it('shows success toast with correct message', async () => {
+  it('shows success toast with correct message [handleAddToWishlist]', async () => {
     const { result } = renderHook(() =>
       useCardActions({
         searchedCard: mockSearchedCard,
@@ -186,7 +187,7 @@ describe('useCardActions', () => {
     );
   });
 
-  it('shows error toast on failure', async () => {
+  it('shows error toast on failure [handleAddToWishlist]', async () => {
     mockCardsManager.addCardToWishlist.mockRejectedValueOnce(
       new Error('API error'),
     );
@@ -208,5 +209,156 @@ describe('useCardActions', () => {
     // Add these to ensure state isn't corrupted:
     expect(mockSetSearchedCard).not.toHaveBeenCalled();
     expect(mockDispatch).not.toHaveBeenCalled();
+  });
+
+  it('performs no actions when searchedCard is undefined [handleRemoveFromWishlist]', async () => {
+    mockSearchedCard = undefined as unknown as ICard;
+    const { result } = renderHook(() =>
+      useCardActions({
+        searchedCard: mockSearchedCard,
+        setSearchedCard: mockSetSearchedCard,
+      }),
+    );
+
+    await act(() => {
+      result.current.handleRemoveFromWishlist();
+    });
+
+    expect(mockSetSearchedCard).toHaveBeenCalledTimes(0);
+    expect(mockDispatch).toHaveBeenCalledTimes(0);
+    expect(mockCardsManager.removeCardFromWishlist).toHaveBeenCalledTimes(0);
+    expect(toast.success).toHaveBeenCalledTimes(0);
+
+    expect(() => {
+      result.current.handleRemoveFromWishlist();
+    }).not.toThrow();
+  });
+
+  it('removes card from wishlist and updates state [handleRemoveFromWishlist]', async () => {
+    const { result } = renderHook(() =>
+      useCardActions({
+        searchedCard: mockSearchedCard,
+        setSearchedCard: mockSetSearchedCard,
+      }),
+    );
+
+    await act(() => {
+      result.current.handleRemoveFromWishlist();
+    });
+
+    expect(mockCardsManager.removeCardFromWishlist).toHaveBeenCalledWith(
+      mockSearchedCard.cardNumber,
+    );
+    expect(mockSetSearchedCard).toHaveBeenCalledWith({
+      ...mockSearchedCard,
+      wishlistCount: 0,
+    });
+    expect(mockDispatch).toHaveBeenCalledWith(
+      updateCardWishlist({
+        cardNumber: mockSearchedCard.cardNumber,
+        wishlistCount: 0,
+      }),
+    );
+    expect(toast.success).toHaveBeenCalledWith(
+      `Removed from wishlist: ${mockSearchedCard.name}`,
+    );
+  });
+
+  it('shows error toast on failure [handleRemoveFromWishlist]', async () => {
+    mockCardsManager.removeCardFromWishlist.mockRejectedValueOnce(
+      new Error('API error'),
+    );
+
+    const { result } = renderHook(() =>
+      useCardActions({
+        searchedCard: mockSearchedCard,
+        setSearchedCard: mockSetSearchedCard,
+      }),
+    );
+    await act(async () => {
+      await result.current.handleRemoveFromWishlist();
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Failed to remove card from wishlist. Please try again.',
+    );
+
+    // Add these to ensure state isn't corrupted:
+    expect(mockSetSearchedCard).not.toHaveBeenCalled();
+    expect(mockDispatch).not.toHaveBeenCalled();
+  });
+
+  it('performs no actions when searchedCard is undefined [onSubmit]', async () => {
+    mockSearchedCard = undefined as unknown as ICard;
+    const { result } = renderHook(() =>
+      useCardActions({
+        searchedCard: mockSearchedCard,
+        setSearchedCard: mockSetSearchedCard,
+      }),
+    );
+
+    await act(() => {
+      result.current.onSubmit();
+    });
+
+    expect(mockCardsManager.addCardToCollection).toHaveBeenCalledTimes(0);
+    expect(mockDispatch).toHaveBeenCalledTimes(0);
+    expect(mockSetSearchedCard).toHaveBeenCalledTimes(0);
+    expect(toast.success).toHaveBeenCalledTimes(0);
+  });
+
+  it('adds card to collection [onSubmit]', async () => {
+    const { result } = renderHook(() =>
+      useCardActions({
+        searchedCard: mockSearchedCard,
+        setSearchedCard: mockSetSearchedCard,
+      }),
+    );
+
+    await act(() => {
+      result.current.onSubmit();
+    });
+    const quantity = Number(result.current.quantity);
+
+    expect(mockCardsManager.addCardToCollection).toHaveBeenCalledWith(
+      mockSearchedCard.cardNumber,
+      quantity,
+    );
+    expect(mockDispatch).toHaveBeenCalledWith(
+      updateCardCount({
+        cardId: mockSearchedCard.id,
+        count: quantity,
+      }),
+    );
+    expect(mockSetSearchedCard).toHaveBeenCalledWith({
+      ...mockSearchedCard,
+      count: quantity,
+    });
+    expect(toast.success).toHaveBeenCalledWith(
+      `New quantity set to your collection: ${quantity} x ${mockSearchedCard.name}`,
+    );
+  });
+
+  it('shows error toast on failure [onSubmit]', async () => {
+    mockCardsManager.addCardToCollection.mockRejectedValueOnce('API Error');
+
+    const { result } = renderHook(() =>
+      useCardActions({
+        searchedCard: mockSearchedCard,
+        setSearchedCard: mockSetSearchedCard,
+      }),
+    );
+
+    await act(() => {
+      result.current.onSubmit();
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'Failed to add card to collection. Please try again.',
+    );
+
+    expect(mockDispatch).toHaveBeenCalledTimes(0);
+    expect(mockSetSearchedCard).toHaveBeenCalledTimes(0);
+    expect(toast.success).toHaveBeenCalledTimes(0);
   });
 });
