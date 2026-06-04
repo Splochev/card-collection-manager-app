@@ -15,5 +15,14 @@ npm run server
 # Kafka Dashboard:
 http://localhost:8081/
 
+# LogTo Dashboard:
+http://localhost:3002/
+username: admin
+password: **********
+
+# Test user:
+username: sunchais
+password: **********
+
 # Get tree
 tree -I "node_modules|.nx|dist" > structure.txt
