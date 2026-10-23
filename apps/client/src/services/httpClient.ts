@@ -17,12 +17,12 @@ export interface IHttpClient {
     config?: AxiosRequestConfig
   ): Promise<{ data: T }>;
   delete<T>(url: string, config?: AxiosRequestConfig): Promise<{ data: T }>;
-  setAuthToken(token: string): void;
-  clearAuthToken(): void;
 }
 
 /**
  * Axios-based HTTP client implementation.
+ * Authentication is handled by the backend via an httpOnly cookie,
+ * so requests only need to include credentials.
  */
 export class AxiosHttpClient implements IHttpClient {
   private axiosInstance: AxiosInstance;
@@ -30,6 +30,7 @@ export class AxiosHttpClient implements IHttpClient {
   constructor(baseURL?: string) {
     this.axiosInstance = axios.create({
       baseURL,
+      withCredentials: true,
     });
   }
 
@@ -61,19 +62,6 @@ export class AxiosHttpClient implements IHttpClient {
     config?: AxiosRequestConfig
   ): Promise<{ data: T }> {
     return this.axiosInstance.delete<T>(url, config);
-  }
-
-  setAuthToken(token: string): void {
-    this.axiosInstance.defaults.headers.common['Authorization'] =
-      `Bearer ${token}`;
-  }
-
-  clearAuthToken(): void {
-    delete this.axiosInstance.defaults.headers.common['Authorization'];
-  }
-
-  getAxiosInstance(): AxiosInstance {
-    return this.axiosInstance;
   }
 }
 

@@ -16,6 +16,7 @@ import {
   ClassSerializerInterceptor,
   Logger,
 } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,7 +28,10 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://localhost:5173',
     ],
+    credentials: true,
   });
+
+  app.use(cookieParser());
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),

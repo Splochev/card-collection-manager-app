@@ -4,6 +4,8 @@ import { type IStorage, storageService } from '../services/storage';
 /**
  * Storage instance for user slice.
  * Can be overridden for testing purposes.
+ * Only the user profile is persisted; the access token lives in an
+ * httpOnly cookie managed by the backend and is never exposed to JS.
  */
 let storage: IStorage = storageService;
 
@@ -23,7 +25,11 @@ export const resetUserSliceStorage = (): void => {
 
 export interface UserState {
   user: any;
-  accessToken: string | null;
+  /**
+   * Whether the backend has set the auth cookie for this session.
+   * API requests should only be made once this is true.
+   */
+  isSessionReady: boolean;
 }
 
 const getInitialUser = (): any => {
@@ -31,14 +37,9 @@ const getInitialUser = (): any => {
   return saved ? JSON.parse(saved) : null;
 };
 
-const getInitialAccessToken = (): string | null => {
-  const saved = storage.getItem('accessToken');
-  return saved ? JSON.parse(saved) : null;
-};
-
 const initialState: UserState = {
   user: getInitialUser(),
-  accessToken: getInitialAccessToken(),
+  isSessionReady: false,
 };
 
 const userSlice = createSlice({
@@ -50,19 +51,16 @@ const userSlice = createSlice({
       storage.setItem('user', JSON.stringify(newUser));
       state.user = newUser;
     },
-    setAccessToken: (state, action: PayloadAction<string | null>) => {
-      const newAccessToken = action.payload;
-      storage.setItem('accessToken', JSON.stringify(newAccessToken));
-      state.accessToken = newAccessToken;
+    setSessionReady: (state, action: PayloadAction<boolean>) => {
+      state.isSessionReady = action.payload;
     },
     clearUser: (state) => {
       storage.removeItem('user');
-      storage.removeItem('accessToken');
       state.user = null;
-      state.accessToken = null;
+      state.isSessionReady = false;
     },
   },
 });
 
-export const { setUser, setAccessToken, clearUser } = userSlice.actions;
+export const { setUser, setSessionReady, clearUser } = userSlice.actions;
 export default userSlice.reducer;

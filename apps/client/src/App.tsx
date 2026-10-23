@@ -69,12 +69,20 @@ function CallbackPage() {
 }
 
 function ProtectedApp() {
+  return (
+    <SDKProvider>
+      <AuthenticatedApp />
+    </SDKProvider>
+  );
+}
+
+function AuthenticatedApp() {
   const theme = useSelector((state: RootState) =>
     state.theme.mode === 'light' ? lightTheme : darkTheme,
   );
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, isSessionReady } = useAuth();
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || !isAuthenticated || !isSessionReady) {
     return (
       <Grid sx={pageLayout}>
         <AppLoadingScreen
@@ -85,14 +93,12 @@ function ProtectedApp() {
   }
 
   return (
-    <SDKProvider>
-      <ThemeProvider theme={theme}>
-        <ScrollbarStyles />
-        <PageLayout />
-        <ConfirmDialog />
-        <ToastContainer />
-      </ThemeProvider>
-    </SDKProvider>
+    <ThemeProvider theme={theme}>
+      <ScrollbarStyles />
+      <PageLayout />
+      <ConfirmDialog />
+      <ToastContainer />
+    </ThemeProvider>
   );
 }
 

@@ -23,8 +23,9 @@ export interface SDKDependencies {
  * This class can be used both as a regular class and as a singleton.
  * Dependencies can be injected for testing purposes.
  *
- * When used as a singleton, it ensures that only one instance of the class is created and shared throughout the application.
- * When used as a normal class, a new instance can be created with custom configurations.
+ * Authentication is cookie based: the Logto access token is handed to the
+ * backend once via `startSession`, which stores it in an httpOnly cookie.
+ * The SDK never keeps the token itself.
  *
  * @example
  *
@@ -35,7 +36,7 @@ export interface SDKDependencies {
  * 2. Singleton Instantiation (Always gets the same instance):
  *  const systemUrl = 'https://example.com';
  *  const sdkSingleton = SDK.getInstance(systemUrl);  // Returns the Singleton instance
- *  sdkSingleton.setTokens('your-auth-token');
+ *  await sdkSingleton.startSession('logto-access-token');
  *
  * 3. Testing with mock dependencies:
  *  const mockStorage = new InMemoryStorage();
@@ -50,8 +51,6 @@ export default class SDK {
 
   public cardsManager: CardsManager;
 
-  private token: string | null = null;
-
   public readonly systemUrl: string;
 
   private readonly storage: IStorage;
@@ -62,7 +61,6 @@ export default class SDK {
     this.systemUrl = systemUrl;
     this.storage = deps?.storage ?? storageService;
     this.httpClient = deps?.httpClient ?? createHttpClient(systemUrl);
-    this.initToken();
     this.cardsManager = new CardsManager(this);
   }
 
@@ -77,7 +75,6 @@ export default class SDK {
     if (!SDK.instance) {
       SDK.instance = new SDK(systemUrl, deps);
     }
-    SDK.instance.initToken();
     return SDK.instance;
   }
 
@@ -103,36 +100,17 @@ export default class SDK {
   }
 
   /**
-   * Sets the authentication token for all managers.
+   * Sends the access token to the backend, which stores it in an httpOnly cookie.
+   * Call again whenever the token is refreshed.
    */
-  public setTokens(token: string): void {
-    this.token = token;
-    this.httpClient.setAuthToken(token);
+  public async startSession(token: string): Promise<void> {
+    await this.httpClient.post('/auth/set-token', { token });
   }
 
   /**
-   * Retrieves the current authentication token.
+   * Asks the backend to clear the httpOnly auth cookie.
    */
-  public getToken(): string | null {
-    return this.token || this.initToken();
-  }
-
-  /**
-   * Clears the authentication token.
-   */
-  public clearTokens(): void {
-    this.token = null;
-    this.httpClient.clearAuthToken();
-  }
-
-  private initToken(): string | null {
-    const tokenJson = this.storage.getItem('accessToken');
-    const token = tokenJson ? JSON.parse(tokenJson) : null;
-    if (token) {
-      this.setTokens(token);
-    } else {
-      this.clearTokens();
-    }
-    return token;
+  public async endSession(): Promise<void> {
+    await this.httpClient.post('/auth/logout');
   }
 }

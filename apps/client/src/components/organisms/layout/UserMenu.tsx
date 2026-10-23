@@ -8,10 +8,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ThemeSwitch from '../../atoms/ThemeSwitch';
 import { Box, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, setAccessToken } from '../../../stores/userSlice';
+import { clearUser } from '../../../stores/userSlice';
 import type { RootState } from '../../../stores/store';
 import { useLogto } from '@logto/react';
 import { LOGTO_POST_LOGOUT_REDIRECT_URI } from '../../../constants';
+import { useSDK } from '../../../contexts/SDKContext';
 
 const STYLES = {
   menu: {
@@ -56,6 +57,7 @@ const UserMenu = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
   const { signOut } = useLogto();
+  const sdk = useSDK();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -70,9 +72,13 @@ const UserMenu = () => {
   };
 
   const handleLogout = async () => {
-    dispatch(setUser(null));
-    dispatch(setAccessToken(null));
     handleClose();
+    try {
+      await sdk.endSession();
+    } catch (err) {
+      console.error('Failed to clear session cookie', err);
+    }
+    dispatch(clearUser());
 
     await signOut(LOGTO_POST_LOGOUT_REDIRECT_URI);
   };

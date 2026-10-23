@@ -41,6 +41,12 @@ function extractBearerTokenFromHeaders(
   return authHeader.slice('Bearer '.length);
 }
 
+function extractTokenFromCookies(
+  cookies: Record<string, string | undefined>,
+): string | undefined {
+  return cookies['accessToken'];
+}
+
 const client = new jwksRsa.JwksClient({
   jwksUri: process.env.LOGTO_BASE_URL + '/oidc/jwks' || '',
 });
@@ -100,7 +106,8 @@ const getKey = (
 export class JwtAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-    const token = extractBearerTokenFromHeaders(req.headers);
+    // Try to get token from httpOnly cookie first, fall back to Bearer header
+    const token = extractTokenFromCookies(req.cookies) || extractBearerTokenFromHeaders(req.headers);
 
     if (!token) {
       throw new UnauthorizedException('No token provided');
